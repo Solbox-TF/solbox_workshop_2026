@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>팀뽑기 — 솔박스 워크샵 2026</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <style>
+    /* === Design Tokens === */
+    :root {
+      --bg:           #060c1a;
+      --surface:      rgba(255,255,255,0.05);
+      --surface-h:    rgba(255,255,255,0.09);
+      --border:       rgba(255,255,255,0.09);
+      --border-h:     rgba(255,255,255,0.20);
+      --txt:          rgba(255,255,255,0.92);
+      --txt-2:        rgba(255,255,255,0.48);
+      --accent:       #6366f1;
+      --accent-2:     #8b5cf6;
+      --a:            #3b82f6;
+      --b:            #a855f7;
+      --c:            #10b981;
+      --r-sm:         8px;
+      --r-md:         14px;
+      --r-lg:         20px;
+      --r-xl:         28px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--txt);
+      min-height: 100vh;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      background-image:
+        radial-gradient(ellipse 90% 55% at 50% -5%,  rgba(99,102,241,.22) 0%, transparent 65%),
+        radial-gradient(ellipse 55% 45% at 85% 85%, rgba(168,85,247,.14) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 35% at 10% 75%, rgba(16,185,129,.08) 0%, transparent 50%);
+    }
+
+    /* === Layout === */
+    .page {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 40px;
+      max-width: 1600px;
+      height: 100vh;
+      margin: 0 auto;
+      padding: 40px 56px 40px;
+      align-items: stretch;
+      box-sizing: border-box;
+    }
+    @media (max-width: 900px) {
+      .page { grid-template-columns: 1fr; height: auto; padding: 32px 20px; }
+    }
+
+    /* === 좌측 사이드바 === */
+    .info-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: 100%;
+    }
+
+    .side-card {
+      border-radius: var(--r-lg);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      backdrop-filter: blur(24px);
+      padding: 20px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .side-card__title {
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--txt-2);
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .info-row { display: flex; flex-direction: column; gap: 4px; }
+    .info-label {
+      font-size: .62rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--txt-2);
+    }
+    .info-value {
+      font-size: .88rem;
+      font-weight: 600;
+      color: var(--txt);
+      line-height: 1.45;
+    }
+    .info-link {
+      color: #60a5fa;
+      text-decoration: none;
+      font-size: .83rem;
+      font-weight: 500;
+      transition: color .15s;
+    }
+    .info-link:hover { color: #93c5fd; text-decoration: underline; }
+    .team-pills { display: flex; flex-direction: column; gap: 5px; }
+    .team-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 10px;
+      border-radius: var(--r-sm);
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.06);
+      font-size: .82rem;
+      font-weight: 600;
+    }
+    .pill-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .pill-dot--red   { background: #f87171; }
+    .pill-dot--green { background: #4ade80; }
+    .pill-dot--media { background: #38bdf8; }
+
+    /* 팀 배치 결과 카드 */
+    .result-card {
+      opacity: .38;
+      transition: opacity .5s ease;
+    }
+    .result-card.revealed { opacity: 1; }
+    .result-list { display: flex; flex-direction: column; gap: 7px; }
+    .result-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 9px 10px 9px 13px;
+      border-radius: var(--r-sm);
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.06);
+      border-left-width: 3px;
+    }
+    .result-row--a { border-left-color: var(--a); }
+    .result-row--b { border-left-color: var(--b); }
+    .result-row--c { border-left-color: var(--c); }
+    .result-team-label {
+      font-size: .62rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--txt-2);
+    }
+    .result-val {
+      font-size: .8rem;
+      font-weight: 500;
+      color: var(--txt);
+      line-height: 1.55;
+    }
+    .result-val.pending { color: var(--txt-2); font-size: .95rem; letter-spacing: .05em; }
+    .result-leader {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+    .result-leader__name {
+      font-size: .88rem;
+      font-weight: 700;
+      color: var(--txt);
+    }
+    .result-leader__tag {
+      font-size: .58rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(251,191,36,.18);
+      border: 1px solid rgba(251,191,36,.35);
+      color: #fbbf24;
+    }
+    .result-members {
+      font-size: .75rem;
+      color: var(--txt-2);
+      line-height: 1.5;
+    }
+
+    /* === Main === */
+    .wrap {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* === Header === */
+    .header {
+      text-align: center;
+      flex-shrink: 0;
+      margin-bottom: 20px;
+    }
+    .header__eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--txt-2);
+      margin-bottom: 14px;
+    }
+    .header__title {
+      font-size: clamp(1.8rem, 3.2vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -.03em;
+      line-height: 1.12;
+      background: linear-gradient(140deg, #fff 30%, rgba(255,255,255,.45));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .header__sub {
+      margin-top: 8px;
+      font-size: .88rem;
+      color: var(--txt-2);
+    }
+
+    /* === Members === */
+    .members-box {
+      flex-shrink: 0;
+      margin-bottom: 16px;
+      padding: 14px 20px;
+      border-radius: var(--r-lg);
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .section-label {
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--txt-2);
+      margin-bottom: 10px;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip {
+      padding: 5px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      font-size: .82rem;
+      font-weight: 500;
+      color: var(--txt-2);
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: color .2s, border-color .2s, background .2s;
+      user-select: none;
+    }
+    .chip.on {
+      color: var(--txt);
+      border-color: var(--border-h);
+      background: var(--surface-h);
+    }
+    /* 수동 선택 모드 칩 상태 */
+    .chip.selectable {
+      cursor: pointer;
+    }
+    .chip.selectable:hover {
+      background: var(--surface-h);
+      border-color: var(--border-h);
+      color: var(--txt);
+    }
+    .chip.leader-a {
+      color: #60a5fa;
+      border-color: rgba(59,130,246,.65);
+      background: rgba(59,130,246,.15);
+      cursor: default;
+      font-weight: 700;
+    }
+    .chip.leader-b {
+      color: #c084fc;
+      border-color: rgba(168,85,247,.65);
+      background: rgba(168,85,247,.15);
+      cursor: default;
+      font-weight: 700;
+    }
+    .chip.leader-c {
+      color: #34d399;
+      border-color: rgba(16,185,129,.65);
+      background: rgba(16,185,129,.15);
+      cursor: default;
+      font-weight: 700;
+    }
+    .chip-team-tag {
+      font-size: .58rem;
+      font-weight: 800;
+      padding: 1px 5px;
+      border-radius: 999px;
+      margin-left: 4px;
+      background: rgba(255,255,255,.15);
+      letter-spacing: .04em;
+    }
+
+    /* === Mode Buttons === */
+    .cta-modes {
+      flex-shrink: 0;
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    /* === Manual Guide === */
+    .manual-guide {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      flex-shrink: 0;
+      margin-bottom: 16px;
+      padding: 16px 20px;
+      border-radius: var(--r-lg);
+      border: 1px solid rgba(99,102,241,.28);
+      background: rgba(99,102,241,.06);
+    }
+    .manual-guide.show { display: flex; }
+    .manual-step {
+      font-size: .9rem;
+      font-weight: 600;
+      color: var(--txt);
+      text-align: center;
+    }
+    .manual-leaders-row {
+      display: flex;
+      gap: 8px;
+    }
+    .mlb {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      padding: 10px 8px;
+      border-radius: var(--r-md);
+      border: 1px dashed rgba(255,255,255,.1);
+      background: rgba(255,255,255,.02);
+      transition: border-color .25s, background .25s;
+      min-width: 0;
+    }
+    .mlb.active-slot {
+      border-style: solid;
+      border-color: rgba(255,255,255,.28);
+      background: rgba(255,255,255,.06);
+    }
+    .mlb--a.filled { border-style: solid; border-color: rgba(59,130,246,.5); background: rgba(59,130,246,.1); }
+    .mlb--b.filled { border-style: solid; border-color: rgba(168,85,247,.5); background: rgba(168,85,247,.1); }
+    .mlb--c.filled { border-style: solid; border-color: rgba(16,185,129,.5); background: rgba(16,185,129,.1); }
+    .mlb-label {
+      font-size: .6rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--txt-2);
+    }
+    .mlb--a .mlb-label { color: #60a5fa; }
+    .mlb--b .mlb-label { color: #c084fc; }
+    .mlb--c .mlb-label { color: #34d399; }
+    .mlb-name {
+      font-size: .85rem;
+      font-weight: 700;
+      color: var(--txt);
+      text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 100%;
+    }
+    .mlb-name.pending {
+      color: var(--txt-2);
+      font-weight: 400;
+      font-size: .8rem;
+    }
+
+    /* === Buttons === */
+    .btn {
+      position: relative;
+      width: 100%;
+      padding: 16px 52px;
+      font: 700 1.05rem/1 'Pretendard Variable', Pretendard, sans-serif;
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border: none;
+      border-radius: var(--r-xl);
+      cursor: pointer;
+      letter-spacing: -.01em;
+      box-shadow: 0 4px 28px rgba(99,102,241,.45), 0 1px 4px rgba(0,0,0,.35);
+      transition: transform .18s ease, box-shadow .18s ease;
+      outline: none;
+    }
+    .btn::after {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: calc(var(--r-xl) + 3px);
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      filter: blur(12px);
+      opacity: 0;
+      z-index: -1;
+      transition: opacity .18s ease;
+    }
+    .btn:hover            { transform: translateY(-2px); box-shadow: 0 10px 36px rgba(99,102,241,.6), 0 2px 8px rgba(0,0,0,.3); }
+    .btn:hover::after     { opacity: .55; }
+    .btn:focus-visible    { outline: 2px solid var(--accent); outline-offset: 4px; }
+    .btn:active           { transform: scale(.985); }
+    .btn:disabled         { opacity: .45; pointer-events: none; }
+
+    /* 수동선택 버튼 — 에메랄드 계열 */
+    .btn--manual {
+      background: linear-gradient(135deg, #0d9488, #10b981);
+      box-shadow: 0 4px 28px rgba(16,185,129,.35), 0 1px 4px rgba(0,0,0,.35);
+    }
+    .btn--manual::after {
+      background: linear-gradient(135deg, #0d9488, #10b981);
+    }
+    .btn--manual:hover { box-shadow: 0 10px 36px rgba(16,185,129,.5), 0 2px 8px rgba(0,0,0,.3); }
+
+    /* 배치 시작 버튼 (수동 확정) */
+    .btn--start {
+      padding: 12px 32px;
+      font-size: .95rem;
+      border-radius: var(--r-lg);
+    }
+
+    /* === Teams Grid === */
+    .teams {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      align-items: stretch;
+    }
+    @media (max-width: 600px) {
+      .teams { grid-template-columns: 1fr; }
+    }
+
+    /* === Team Card === */
+    .card {
+      border-radius: var(--r-lg);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      backdrop-filter: blur(24px);
+      padding: 22px 20px;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      transform: translateY(18px) scale(.97);
+      transition: box-shadow .3s, border-color .3s;
+    }
+    .card:hover {
+      border-color: var(--border-h);
+      box-shadow: 0 8px 36px rgba(0,0,0,.28);
+    }
+    .card.show {
+      animation: cardIn .52s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(18px) scale(.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .card--a { border-top: 2px solid var(--a); }
+    .card--b { border-top: 2px solid var(--b); }
+    .card--c { border-top: 2px solid var(--c); }
+
+    .card-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .card--a .badge { background: rgba(59,130,246,.18); color: #60a5fa; }
+    .card--b .badge { background: rgba(168,85,247,.18); color: #c084fc; }
+    .card--c .badge { background: rgba(16,185,129,.18); color: #34d399; }
+
+    .card-title { font-size: 1rem; font-weight: 700; }
+    .card-count { font-size: .75rem; color: var(--txt-2); margin-top: 2px; }
+
+    .member-list {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-height: 0;
+    }
+
+    .m-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--r-sm);
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.06);
+      font-size: .92rem;
+      font-weight: 500;
+      opacity: 0;
+      animation: memberIn .35s cubic-bezier(.4,0,.2,1) both;
+    }
+    .m-item.leader {
+      background: rgba(255,255,255,.08);
+      border-color: rgba(255,255,255,.16);
+      font-weight: 700;
+    }
+    .m-item__name { flex: 1; }
+    .leader-tag {
+      font-size: .62rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(251,191,36,.18);
+      border: 1px solid rgba(251,191,36,.35);
+      color: #fbbf24;
+      white-space: nowrap;
+    }
+    @keyframes memberIn {
+      from { opacity: 0; transform: translateX(-10px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .card--a .dot { background: var(--a); }
+    .card--b .dot { background: var(--b); }
+    .card--c .dot { background: var(--c); }
+
+    .empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 170px;
+      gap: 10px;
+      color: var(--txt-2);
+      font-size: .85rem;
+    }
+    .empty-icon { font-size: 2rem; opacity: .35; }
+
+    .sk {
+      border-radius: 6px;
+      height: 38px;
+      background: linear-gradient(90deg,
+        rgba(255,255,255,.04) 25%,
+        rgba(255,255,255,.10) 50%,
+        rgba(255,255,255,.04) 75%);
+      background-size: 200% 100%;
+      animation: sk 1.2s linear infinite;
+    }
+    @keyframes sk {
+      0%   { background-position:  200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* === Draw Timestamp === */
+    .draw-done {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding: 14px 22px;
+      border-radius: var(--r-md);
+      background: rgba(99,102,241,.10);
+      border: 1px solid rgba(99,102,241,.28);
+      font-size: .875rem;
+    }
+    .draw-done.show { display: flex; }
+    .draw-done__label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--txt-2);
+    }
+    .draw-done__dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #818cf8;
+      box-shadow: 0 0 6px #818cf8;
+      flex-shrink: 0;
+    }
+    .draw-done__time {
+      font-weight: 700;
+      color: var(--txt);
+      font-size: .875rem;
+      white-space: nowrap;
+    }
+
+    /* === 초기화 버튼 === */
+    .btn-reset {
+      position: absolute;
+      top: 40px;
+      right: 56px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: var(--r-md);
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      color: var(--txt-2);
+      font: 600 .78rem/1 'Pretendard Variable', Pretendard, sans-serif;
+      cursor: pointer;
+      transition: background .15s, color .15s, border-color .15s;
+      outline: none;
+    }
+    .btn-reset:hover { background: rgba(239,68,68,.15); border-color: rgba(239,68,68,.35); color: #f87171; }
+    .btn-reset:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .btn-reset:active { transform: scale(.97); }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+      }
+    }
+
+    @media (max-width: 440px) {
+      .wrap { padding: 36px 16px 72px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page" style="position:relative">
+
+  <button class="btn-reset" id="btnReset" type="button" title="결과 초기화">↺ 초기화</button>
+
+  <!-- 좌측 사이드바 -->
+  <aside class="info-sidebar">
+
+    <div class="side-card">
+      <div class="side-card__title">행사 정보</div>
+      <div class="info-row">
+        <span class="info-label">장소</span>
+        <a class="info-link"
+           href="https://smartstore.naver.com/sinsanoriteo/products/12639811041#REVIEW"
+           target="_blank" rel="noopener">
+          신사노리터오 스마트스토어 ↗
+        </a>
+      </div>
+      <div class="info-row">
+        <span class="info-label">날짜</span>
+        <span class="info-value">2026 / 6 / 16 (화)</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">참여 팀</span>
+        <div class="team-pills">
+          <div class="team-pill"><span class="pill-dot pill-dot--red"></span>RED</div>
+          <div class="team-pill"><span class="pill-dot pill-dot--green"></span>GREEN</div>
+          <div class="team-pill"><span class="pill-dot pill-dot--media"></span>MEDIA</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-card result-card" id="resultCard">
+      <div class="side-card__title">팀 배치 결과</div>
+      <div class="result-list">
+        <div class="result-row result-row--a">
+          <span class="result-team-label">A팀</span>
+          <span class="result-val pending" id="resA">?</span>
+        </div>
+        <div class="result-row result-row--b">
+          <span class="result-team-label">B팀</span>
+          <span class="result-val pending" id="resB">?</span>
+        </div>
+        <div class="result-row result-row--c">
+          <span class="result-team-label">C팀</span>
+          <span class="result-val pending" id="resC">?</span>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- 메인 콘텐츠 -->
+  <div class="wrap">
+
+    <header class="header">
+      <div class="header__eyebrow">⚡ SOLBOX WORKSHOP 2026</div>
+      <h1 class="header__title">팀 뽑기</h1>
+      <p class="header__sub">15명을 A · B · C 세 팀으로 랜덤 분배합니다</p>
+    </header>
+
+    <section class="members-box">
+      <div class="section-label">전체 참가자 · 15명</div>
+      <div class="chips" id="chips"></div>
+    </section>
+
+    <!-- 모드 선택 버튼 2개 -->
+    <div class="cta-modes" id="ctaModes">
+      <button class="btn" id="btnAuto" type="button">🎲 자동 뽑기</button>
+      <button class="btn btn--manual" id="btnManual" type="button">👆 팀장 수동선택</button>
+    </div>
+
+    <!-- 수동 선택 가이드 (팀장 3명 선택 중) -->
+    <div class="manual-guide" id="manualGuide">
+      <div class="manual-step" id="manualStep">A팀 팀장을 선택해주세요</div>
+      <div class="manual-leaders-row" id="manualLeadersRow">
+        <div class="mlb mlb--a active-slot" id="mlbA">
+          <span class="mlb-label">A팀장</span>
+          <span class="mlb-name pending" id="mlbNameA">선택 전</span>
+        </div>
+        <div class="mlb mlb--b" id="mlbB">
+          <span class="mlb-label">B팀장</span>
+          <span class="mlb-name pending" id="mlbNameB">선택 전</span>
+        </div>
+        <div class="mlb mlb--c" id="mlbC">
+          <span class="mlb-label">C팀장</span>
+          <span class="mlb-name pending" id="mlbNameC">선택 전</span>
+        </div>
+      </div>
+      <button class="btn btn--start" id="btnStartDraw" type="button" style="display:none">🎯 팀 배치 시작</button>
+    </div>
+
+    <div class="draw-done" id="drawDone">
+      <div class="draw-done__label">
+        <span class="draw-done__dot"></span>
+        팀 배치 완료 —
+      </div>
+      <span class="draw-done__time" id="drawTime"></span>
+    </div>
+
+    <div class="teams">
+      <div class="card card--a" id="cardA">
+        <div class="card-head">
+          <div class="badge">A</div>
+          <div>
+            <div class="card-title">A팀</div>
+            <div class="card-count" id="cntA">대기 중</div>
+          </div>
+        </div>
+        <div class="member-list" id="listA">
+          <div class="empty"><span class="empty-icon">🎯</span>버튼을 눌러주세요</div>
+        </div>
+      </div>
+
+      <div class="card card--b" id="cardB">
+        <div class="card-head">
+          <div class="badge">B</div>
+          <div>
+            <div class="card-title">B팀</div>
+            <div class="card-count" id="cntB">대기 중</div>
+          </div>
+        </div>
+        <div class="member-list" id="listB">
+          <div class="empty"><span class="empty-icon">🎯</span>버튼을 눌러주세요</div>
+        </div>
+      </div>
+
+      <div class="card card--c" id="cardC">
+        <div class="card-head">
+          <div class="badge">C</div>
+          <div>
+            <div class="card-title">C팀</div>
+            <div class="card-count" id="cntC">대기 중</div>
+          </div>
+        </div>
+        <div class="member-list" id="listC">
+          <div class="empty"><span class="empty-icon">🎯</span>버튼을 눌러주세요</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- .wrap -->
+</div><!-- .page -->
+
+<script>
+  const MEMBERS = [
+    '김보라','김지영','김진수','김현호','나수현',
+    '노경민','두소희','박성빈','서용석','이강희',
+    '이종필','임민성','조현서','채민관','황태웅'
+  ];
+  const STORE_KEY   = 'solbox_teamdraw_2026';
+  const SESSION_KEY = 'solbox_session_2026';
+
+  // 수동 선택 상태
+  // 'idle' | 'manual-A' | 'manual-B' | 'manual-C' | 'manual-ready' | 'done'
+  let appState = 'idle';
+  const selectedLeaders = { A: null, B: null, C: null };
+
+  // 멤버 칩 초기 렌더링
+  const chipsEl = document.getElementById('chips');
+  MEMBERS.forEach(name => {
+    const el = document.createElement('span');
+    el.className = 'chip';
+    el.id = 'chip-' + name;
+    el.textContent = name;
+    chipsEl.appendChild(el);
+  });
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function fmtDate(iso) {
+    const d = new Date(iso);
+    const pad = n => String(n).padStart(2, '0');
+    const days = ['일','월','화','수','목','금','토'];
+    return `${d.getFullYear()}. ${pad(d.getMonth()+1)}. ${pad(d.getDate())} (${days[d.getDay()]})  ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  function skeletonHTML() {
+    return [0,1,2,3,4].map(i =>
+      `<div class="sk" style="animation-delay:${i * .08}s"></div>`
+    ).join('');
+  }
+
+  function applyResults(teams, drawnAt, animate) {
+    appState = 'done';
+
+    ['A','B','C'].forEach(t =>
+      teams[t].forEach(n => {
+        const el = document.getElementById('chip-' + n);
+        el.className = 'chip on';
+        el.textContent = n;
+      })
+    );
+
+    ['A','B','C'].forEach((t, ti) => {
+      const card = document.getElementById('card' + t);
+      card.style.opacity = '';
+      card.style.transform = '';
+      if (animate) {
+        card.classList.remove('show');
+        void card.offsetWidth;
+        card.style.animationDelay = `${ti * .18}s`;
+      }
+      card.classList.add('show');
+
+      document.getElementById('cnt' + t).textContent = `${teams[t].length}명`;
+      const list = document.getElementById('list' + t);
+      list.innerHTML = '';
+      teams[t].forEach((name, i) => {
+        const el = document.createElement('div');
+        el.className = 'm-item' + (i === 0 ? ' leader' : '');
+        if (animate) el.style.animationDelay = `${.1 + i * .07 + ti * .18}s`;
+        el.innerHTML = `<span class="dot"></span><span class="m-item__name">${name}</span>${i === 0 ? '<span class="leader-tag">팀장</span>' : ''}`;
+        list.appendChild(el);
+      });
+    });
+
+    ['A','B','C'].forEach(t => {
+      const el = document.getElementById('res' + t);
+      el.classList.remove('pending');
+      const [leader, ...rest] = teams[t];
+      el.innerHTML = `
+        <div class="result-leader">
+          <span class="result-leader__name">${leader}</span>
+          <span class="result-leader__tag">팀장</span>
+        </div>
+        <div class="result-members">${rest.join(', ')}</div>
+      `;
+    });
+    document.getElementById('resultCard').classList.add('revealed');
+
+    document.getElementById('ctaModes').style.display    = 'none';
+    document.getElementById('manualGuide').classList.remove('show');
+    document.getElementById('drawTime').textContent = fmtDate(drawnAt);
+    document.getElementById('drawDone').classList.add('show');
+  }
+
+  // ── 자동 뽑기 ──
+  function drawAuto() {
+    const btnAuto = document.getElementById('btnAuto');
+    btnAuto.disabled = true;
+    btnAuto.textContent = '🎲 섞는 중…';
+
+    document.getElementById('resultCard').classList.remove('revealed');
+    ['A','B','C'].forEach(t => {
+      const card = document.getElementById('card' + t);
+      card.classList.remove('show');
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(18px) scale(.97)';
+      document.getElementById('list' + t).innerHTML = skeletonHTML();
+      document.getElementById('cnt' + t).textContent = '분배 중…';
+    });
+
+    setTimeout(() => {
+      const s = shuffle(MEMBERS);
+      const teams = { A: s.slice(0,5), B: s.slice(5,10), C: s.slice(10,15) };
+      const drawnAt = new Date().toISOString();
+      saveAndApply(teams, drawnAt, true);
+    }, 650);
+  }
+
+  // ── 수동 선택 모드 시작 ──
+  function startManualMode() {
+    appState = 'manual-A';
+    document.getElementById('ctaModes').style.display = 'none';
+    document.getElementById('manualGuide').classList.add('show');
+    updateManualGuide();
+    document.querySelectorAll('.chip').forEach(el => el.classList.add('selectable'));
+  }
+
+  function updateManualGuide() {
+    const stepTexts = {
+      'manual-A': 'A팀 팀장을 선택해주세요',
+      'manual-B': 'B팀 팀장을 선택해주세요',
+      'manual-C': 'C팀 팀장을 선택해주세요',
+      'manual-ready': '팀장 선택 완료! 팀 배치를 시작하세요',
+    };
+    document.getElementById('manualStep').textContent = stepTexts[appState] || '';
+
+    ['A','B','C'].forEach(t => {
+      const mlb   = document.getElementById('mlb' + t);
+      const nameEl = document.getElementById('mlbName' + t);
+      mlb.classList.remove('active-slot', 'filled');
+
+      if (selectedLeaders[t]) {
+        mlb.classList.add('filled');
+        nameEl.className = 'mlb-name';
+        nameEl.textContent = selectedLeaders[t];
+      } else {
+        nameEl.className = 'mlb-name pending';
+        nameEl.textContent = '선택 전';
+      }
+    });
+
+    // 현재 선택 중인 팀 슬롯 강조
+    const activeTeam = appState.split('-')[1]; // 'A', 'B', 'C'
+    if (activeTeam && ['A','B','C'].includes(activeTeam) && !selectedLeaders[activeTeam]) {
+      document.getElementById('mlb' + activeTeam).classList.add('active-slot');
+    }
+
+    const startBtn = document.getElementById('btnStartDraw');
+    startBtn.style.display = appState === 'manual-ready' ? 'block' : 'none';
+  }
+
+  // 칩 클릭 핸들러 (수동 모드)
+  chipsEl.addEventListener('click', e => {
+    const chip = e.target.closest('.chip');
+    if (!chip || !chip.classList.contains('selectable')) return;
+
+    const teamOrder = { 'manual-A': 'A', 'manual-B': 'B', 'manual-C': 'C' };
+    const team = teamOrder[appState];
+    if (!team) return;
+
+    const name = chip.id.replace('chip-', '');
+    selectedLeaders[team] = name;
+
+    // 칩 스타일 변경
+    chip.classList.remove('selectable');
+    chip.classList.add('leader-' + team.toLowerCase());
+    chip.innerHTML = `${name}<span class="chip-team-tag">${team}팀장</span>`;
+
+    const next = { A: 'manual-B', B: 'manual-C', C: 'manual-ready' };
+    appState = next[team];
+    updateManualGuide();
+  });
+
+  // 팀 배치 시작 (수동)
+  document.getElementById('btnStartDraw').addEventListener('click', () => {
+    document.getElementById('btnStartDraw').disabled = true;
+    document.getElementById('btnStartDraw').textContent = '🎯 배치 중…';
+
+    document.getElementById('resultCard').classList.remove('revealed');
+    ['A','B','C'].forEach(t => {
+      const card = document.getElementById('card' + t);
+      card.classList.remove('show');
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(18px) scale(.97)';
+      document.getElementById('list' + t).innerHTML = skeletonHTML();
+      document.getElementById('cnt' + t).textContent = '분배 중…';
+    });
+
+    setTimeout(() => {
+      const leaderSet = new Set(Object.values(selectedLeaders));
+      const remaining = shuffle(MEMBERS.filter(m => !leaderSet.has(m)));
+      const teams = {
+        A: [selectedLeaders.A, ...remaining.slice(0, 4)],
+        B: [selectedLeaders.B, ...remaining.slice(4, 8)],
+        C: [selectedLeaders.C, ...remaining.slice(8, 12)],
+      };
+      const drawnAt = new Date().toISOString();
+      saveAndApply(teams, drawnAt, true);
+    }, 650);
+  });
+
+  function saveAndApply(teams, drawnAt, animate) {
+    localStorage.setItem(STORE_KEY, JSON.stringify({ teams, drawnAt }));
+    fetch('/api/session').then(r => r.json()).then(({ id }) => localStorage.setItem(SESSION_KEY, id));
+    applyResults(teams, drawnAt, animate);
+  }
+
+  document.getElementById('btnAuto').addEventListener('click', e => {
+    e.preventDefault();
+    drawAuto();
+  });
+
+  document.getElementById('btnManual').addEventListener('click', e => {
+    e.preventDefault();
+    startManualMode();
+  });
+
+  document.getElementById('btnReset').addEventListener('click', () => {
+    if (!confirm('팀 배치 결과를 초기화할까요?')) return;
+    localStorage.removeItem(STORE_KEY);
+    location.reload();
+  });
+
+  // 서버 세션 확인
+  fetch('/api/session')
+    .then(r => r.json())
+    .then(({ id }) => {
+      if (localStorage.getItem(SESSION_KEY) !== id) {
+        localStorage.removeItem(STORE_KEY);
+        localStorage.setItem(SESSION_KEY, id);
+        return;
+      }
+      const saved = localStorage.getItem(STORE_KEY);
+      if (saved) {
+        try {
+          const { teams, drawnAt } = JSON.parse(saved);
+          applyResults(teams, drawnAt, false);
+        } catch (_) {
+          localStorage.removeItem(STORE_KEY);
+        }
+      }
+    })
+    .catch(() => {
+      const saved = localStorage.getItem(STORE_KEY);
+      if (saved) {
+        try {
+          const { teams, drawnAt } = JSON.parse(saved);
+          applyResults(teams, drawnAt, false);
+        } catch (_) { localStorage.removeItem(STORE_KEY); }
+      }
+    });
+</script>
+</body>
+</html>
