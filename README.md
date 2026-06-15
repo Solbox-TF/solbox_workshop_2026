@@ -26,6 +26,16 @@ npm run start:recreation
 
 팀 배치 도구와 레크 게임은 SST `StaticSite`로 S3 + CloudFront에 배포한다.
 
+`main` 브랜치에 push하면 GitHub Actions가 production stage로 자동 배포한다.
+수동 배포가 필요하면 GitHub Actions의 `Deploy` workflow에서 `Run workflow`를 실행한다.
+
+GitHub 저장소 설정에 아래 값을 등록해야 한다.
+
+- Secret `AWS_ROLE_ARN`: GitHub OIDC로 assume할 AWS IAM role ARN
+- Variable `AWS_REGION`: `ap-northeast-2`
+
+로컬에서 직접 배포:
+
 ```bash
 AWS_PROFILE=<profile> npm run deploy:aws
 ```
