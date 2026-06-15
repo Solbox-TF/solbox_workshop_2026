@@ -19,11 +19,12 @@ npm run start:recreation
 
 - 팀 배치 도구: http://localhost:1140
 - 레크 게임: http://localhost:4173
+- 배포된 팀 배치 도구: https://picker.ollida.kr
 - 배포된 레크 게임: https://game.ollida.kr
 
 ## 배포
 
-레크 게임은 SST `StaticSite`로 S3 + CloudFront에 배포한다.
+팀 배치 도구와 레크 게임은 SST `StaticSite`로 S3 + CloudFront에 배포한다.
 
 ```bash
 AWS_PROFILE=<profile> npm run deploy:aws

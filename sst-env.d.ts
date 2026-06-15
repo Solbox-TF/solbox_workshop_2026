@@ -10,6 +10,10 @@ declare module "sst" {
       "type": "sst.aws.StaticSite"
       "url": string
     }
+    "TeamPicker": {
+      "type": "sst.aws.StaticSite"
+      "url": string
+    }
   }
 }
 

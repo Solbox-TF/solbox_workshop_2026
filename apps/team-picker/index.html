@@ -898,6 +898,7 @@
   ];
   const STORE_KEY   = 'solbox_teamdraw_2026';
   const SESSION_KEY = 'solbox_session_2026';
+  const STATIC_SESSION_ID = 'static-2026-01';
   const TEAM_IDS = ['A','B','C'];
   let selectedMembers = [...MEMBERS];
 
@@ -1209,7 +1210,7 @@
 
   function saveAndApply(teams, drawnAt, animate) {
     localStorage.setItem(STORE_KEY, JSON.stringify({ teams, drawnAt, selectedMembers }));
-    fetch('/api/session').then(r => r.json()).then(({ id }) => localStorage.setItem(SESSION_KEY, id));
+    localStorage.setItem(SESSION_KEY, STATIC_SESSION_ID);
     applyResults(teams, drawnAt, animate);
   }
 
@@ -1241,40 +1242,24 @@
     location.reload();
   });
 
-  // 서버 세션 확인
-  fetch('/api/session')
-    .then(r => r.json())
-    .then(({ id }) => {
-      if (localStorage.getItem(SESSION_KEY) !== id) {
-        localStorage.removeItem(STORE_KEY);
-        localStorage.setItem(SESSION_KEY, id);
-        return;
-      }
-      const saved = localStorage.getItem(STORE_KEY);
-      if (saved) {
-        try {
-          const { teams, drawnAt, selectedMembers: savedMembers } = JSON.parse(saved);
-          if (Array.isArray(savedMembers)) {
-            selectedMembers = MEMBERS.filter(member => savedMembers.includes(member));
-          }
-          applyResults(teams, drawnAt, false);
-        } catch (_) {
-          localStorage.removeItem(STORE_KEY);
+  // 정적 배포에서도 이전 결과를 복원하되, 버전이 바뀌면 자동 초기화합니다.
+  if (localStorage.getItem(SESSION_KEY) !== STATIC_SESSION_ID) {
+    localStorage.removeItem(STORE_KEY);
+    localStorage.setItem(SESSION_KEY, STATIC_SESSION_ID);
+  } else {
+    const saved = localStorage.getItem(STORE_KEY);
+    if (saved) {
+      try {
+        const { teams, drawnAt, selectedMembers: savedMembers } = JSON.parse(saved);
+        if (Array.isArray(savedMembers)) {
+          selectedMembers = MEMBERS.filter(member => savedMembers.includes(member));
         }
+        applyResults(teams, drawnAt, false);
+      } catch (_) {
+        localStorage.removeItem(STORE_KEY);
       }
-    })
-    .catch(() => {
-      const saved = localStorage.getItem(STORE_KEY);
-      if (saved) {
-        try {
-          const { teams, drawnAt, selectedMembers: savedMembers } = JSON.parse(saved);
-          if (Array.isArray(savedMembers)) {
-            selectedMembers = MEMBERS.filter(member => savedMembers.includes(member));
-          }
-          applyResults(teams, drawnAt, false);
-        } catch (_) { localStorage.removeItem(STORE_KEY); }
-      }
-    });
+    }
+  }
 
   updateSelectionUI();
 </script>
