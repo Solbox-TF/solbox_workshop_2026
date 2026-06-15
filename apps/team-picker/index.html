@@ -704,6 +704,172 @@
       white-space: nowrap;
     }
 
+    .draw-stage {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      gap: 14px;
+      margin-bottom: 16px;
+      padding: 16px 20px;
+      border-radius: var(--r-lg);
+      border: 1px solid rgba(251,191,36,.28);
+      background: linear-gradient(135deg, rgba(251,191,36,.12), rgba(99,102,241,.08));
+    }
+    .draw-stage.show { display: flex; }
+    .draw-stage__kicker {
+      margin-bottom: 4px;
+      color: #fbbf24;
+      font-size: .68rem;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .draw-stage__text {
+      color: var(--txt);
+      font-size: .95rem;
+      font-weight: 700;
+    }
+    .draw-stage__actions {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .draw-stage__btn {
+      min-width: 132px;
+      padding: 11px 16px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: var(--r-md);
+      background: rgba(255,255,255,.08);
+      color: var(--txt);
+      font: 800 .82rem/1 'Pretendard Variable', Pretendard, sans-serif;
+      cursor: pointer;
+      transition: transform .15s, background .15s, border-color .15s;
+    }
+    .draw-stage__btn:hover {
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.13);
+      border-color: rgba(255,255,255,.32);
+    }
+    .draw-stage__btn--primary {
+      border-color: rgba(251,191,36,.45);
+      background: linear-gradient(135deg, rgba(251,191,36,.95), rgba(245,158,11,.95));
+      color: #160f05;
+    }
+
+    .lottery-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      display: none;
+      place-items: center;
+      padding: 24px;
+      background: rgba(6,12,26,.76);
+      backdrop-filter: blur(18px);
+    }
+    .lottery-modal.show { display: grid; }
+    .lottery-panel {
+      width: min(680px, 100%);
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 28px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.05)),
+        #091122;
+      box-shadow: 0 34px 90px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.12);
+      padding: clamp(24px, 5vw, 38px);
+      text-align: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .lottery-panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 24% 18%, rgba(251,191,36,.22), transparent 30%),
+        radial-gradient(circle at 80% 78%, rgba(99,102,241,.24), transparent 34%);
+    }
+    .lottery-panel > * { position: relative; }
+    .lottery-eyebrow {
+      margin-bottom: 8px;
+      color: #fbbf24;
+      font-size: .78rem;
+      font-weight: 900;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+    .lottery-title {
+      margin-bottom: 18px;
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      font-weight: 900;
+      letter-spacing: -.04em;
+    }
+    .lottery-machine {
+      width: min(340px, 78vw);
+      height: auto;
+      margin: 0 auto 18px;
+      display: block;
+      filter: drop-shadow(0 20px 36px rgba(0,0,0,.36));
+    }
+    .lottery-ball {
+      transform-origin: 160px 134px;
+      animation: ballSpin 1.35s linear infinite;
+    }
+    .lottery-ball:nth-of-type(2) { animation-duration: 1.1s; animation-delay: -.2s; }
+    .lottery-ball:nth-of-type(3) { animation-duration: 1.55s; animation-delay: -.45s; }
+    .lottery-ball:nth-of-type(4) { animation-duration: 1.25s; animation-delay: -.65s; }
+    .lottery-ball:nth-of-type(5) { animation-duration: 1.7s; animation-delay: -.3s; }
+    .lottery-ball:nth-of-type(6) { animation-duration: 1.18s; animation-delay: -.8s; }
+    @keyframes ballSpin {
+      from { transform: rotate(0deg) translateX(22px) rotate(0deg); }
+      to   { transform: rotate(360deg) translateX(22px) rotate(-360deg); }
+    }
+    .lottery-status {
+      color: var(--txt-2);
+      font-size: clamp(1rem, 2.2vw, 1.3rem);
+      font-weight: 700;
+    }
+    .lottery-slots {
+      min-height: 64px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .lottery-slot {
+      min-width: 78px;
+      height: 50px;
+      padding: 0 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.18);
+      color: #fff;
+      font-size: clamp(1.1rem, 3vw, 1.6rem);
+      font-weight: 900;
+      animation: slotPop .34s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    .lottery-slot.is-spinning {
+      min-width: 96px;
+      background: rgba(99,102,241,.24);
+      border-color: rgba(255,255,255,.28);
+      box-shadow: 0 0 22px rgba(99,102,241,.28);
+    }
+    .lottery-slot.is-final {
+      background: linear-gradient(135deg, rgba(251,191,36,.96), rgba(245,158,11,.96));
+      border-color: rgba(255,255,255,.56);
+      color: #160f05;
+      box-shadow: 0 12px 28px rgba(251,191,36,.24);
+    }
+    @keyframes slotPop {
+      from { opacity: 0; transform: translateY(10px) scale(.8); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
     /* === 초기화 버튼 === */
     .btn-reset {
       position: absolute;
@@ -735,6 +901,8 @@
 
     @media (max-width: 440px) {
       .wrap { padding: 36px 16px 72px; }
+      .draw-stage { align-items: stretch; flex-direction: column; }
+      .draw-stage__actions { flex-direction: column; }
     }
   </style>
 </head>
@@ -846,6 +1014,17 @@
       <span class="draw-done__time" id="drawTime"></span>
     </div>
 
+    <div class="draw-stage" id="drawStage">
+      <div>
+        <div class="draw-stage__kicker" id="drawStageKicker">TEAM DRAW</div>
+        <div class="draw-stage__text" id="drawStageText">A팀부터 순서대로 공개합니다</div>
+      </div>
+      <div class="draw-stage__actions">
+        <button class="draw-stage__btn draw-stage__btn--primary" id="btnRevealNext" type="button">A팀 뽑기</button>
+        <button class="draw-stage__btn" id="btnRevealAll" type="button">전체 공개</button>
+      </div>
+    </div>
+
     <div class="teams">
       <div class="card card--a" id="cardA">
         <div class="card-head">
@@ -890,6 +1069,42 @@
   </div><!-- .wrap -->
 </div><!-- .page -->
 
+<div class="lottery-modal" id="lotteryModal" aria-hidden="true">
+  <div class="lottery-panel" role="status" aria-live="polite">
+    <p class="lottery-eyebrow" id="lotteryEyebrow">A팀 추첨 중</p>
+    <h2 class="lottery-title" id="lotteryTitle">공을 섞는 중</h2>
+    <svg class="lottery-machine" viewBox="0 0 320 260" aria-hidden="true">
+      <defs>
+        <linearGradient id="drumGlass" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0" stop-color="rgba(255,255,255,.72)" />
+          <stop offset=".46" stop-color="rgba(255,255,255,.16)" />
+          <stop offset="1" stop-color="rgba(255,255,255,.05)" />
+        </linearGradient>
+        <linearGradient id="goldTube" x1="0" x2="1">
+          <stop offset="0" stop-color="#fbbf24" />
+          <stop offset="1" stop-color="#f59e0b" />
+        </linearGradient>
+      </defs>
+      <path d="M78 214h164l18 26H60l18-26Z" fill="rgba(255,255,255,.1)" stroke="rgba(255,255,255,.24)" />
+      <rect x="104" y="190" width="112" height="30" rx="15" fill="url(#goldTube)" />
+      <circle cx="160" cy="118" r="92" fill="url(#drumGlass)" stroke="rgba(255,255,255,.5)" stroke-width="3" />
+      <circle cx="160" cy="118" r="66" fill="rgba(6,12,26,.2)" stroke="rgba(255,255,255,.14)" />
+      <g>
+        <circle class="lottery-ball" cx="128" cy="96" r="16" fill="#60a5fa" />
+        <circle class="lottery-ball" cx="174" cy="80" r="15" fill="#c084fc" />
+        <circle class="lottery-ball" cx="196" cy="128" r="16" fill="#34d399" />
+        <circle class="lottery-ball" cx="132" cy="145" r="15" fill="#fbbf24" />
+        <circle class="lottery-ball" cx="166" cy="154" r="14" fill="#fb7185" />
+        <circle class="lottery-ball" cx="144" cy="118" r="13" fill="#38bdf8" />
+      </g>
+      <path d="M226 122h58c13 0 24 11 24 24s-11 24-24 24h-40" fill="none" stroke="url(#goldTube)" stroke-width="16" stroke-linecap="round" />
+      <circle cx="286" cy="146" r="15" fill="#fff7ed" stroke="#f59e0b" stroke-width="5" />
+    </svg>
+    <div class="lottery-slots" id="lotterySlots"></div>
+    <p class="lottery-status" id="lotteryStatus">잠시만요, 공이 굴러가고 있어요</p>
+  </div>
+</div>
+
 <script>
   const MEMBERS = [
     '김보라','김지영','김진수','김현호','나수현',
@@ -901,9 +1116,10 @@
   const STATIC_SESSION_ID = 'static-2026-01';
   const TEAM_IDS = ['A','B','C'];
   let selectedMembers = [...MEMBERS];
+  let pendingDraw = null;
 
   // 수동 선택 상태
-  // 'selecting' | 'manual-A' | 'manual-B' | 'manual-C' | 'manual-ready' | 'done'
+  // 'selecting' | 'manual-A' | 'manual-B' | 'manual-C' | 'manual-ready' | 'revealing' | 'done'
   let appState = 'selecting';
   const selectedLeaders = { A: null, B: null, C: null };
 
@@ -991,16 +1207,10 @@
     ).join('');
   }
 
-  function applyResults(teams, drawnAt, animate) {
-    appState = 'done';
-    const placedCount = TEAM_IDS.reduce((sum, t) => sum + teams[t].length, 0);
-
-    document.getElementById('selectedCount').textContent = `${placedCount}명 배치`;
-    document.getElementById('selectionMeta').innerHTML =
-      `<strong>${placedCount}명</strong> 배치 완료 → ${teamSizeText(placedCount)}`;
+  function lockSelectionForDraw(placedCount, teams) {
+    document.getElementById('selectedCount').textContent = `${placedCount}명 추첨`;
+    document.getElementById('selectionMeta').innerHTML = `<strong>${placedCount}명</strong> 추첨 준비 완료`;
     document.getElementById('selectionError').textContent = '';
-    document.getElementById('headerSub').textContent =
-      `${placedCount}명을 A · B · C 세 팀으로 배치했습니다`;
     document.getElementById('btnSelectAll').disabled = true;
     document.getElementById('btnClearSelection').disabled = true;
 
@@ -1009,54 +1219,193 @@
       el.className = 'chip locked';
       el.textContent = name;
     });
-    TEAM_IDS.forEach(t =>
-      teams[t].forEach(n => {
-        const el = document.getElementById('chip-' + n);
-        if (!el) return;
-        el.className = 'chip on';
-        el.textContent = n;
-      })
-    );
+    if (teams) {
+      TEAM_IDS.forEach(t =>
+        teams[t].forEach(n => {
+          const el = document.getElementById('chip-' + n);
+          if (!el) return;
+          el.className = 'chip on';
+          el.textContent = n;
+        })
+      );
+    }
+  }
 
-    TEAM_IDS.forEach((t, ti) => {
-      const card = document.getElementById('card' + t);
-      card.style.opacity = '';
-      card.style.transform = '';
-      if (animate) {
-        card.classList.remove('show');
-        void card.offsetWidth;
-        card.style.animationDelay = `${ti * .18}s`;
-      }
-      card.classList.add('show');
-
-      document.getElementById('cnt' + t).textContent = `${teams[t].length}명`;
-      const list = document.getElementById('list' + t);
-      list.innerHTML = '';
-      teams[t].forEach((name, i) => {
-        const el = document.createElement('div');
-        el.className = 'm-item' + (i === 0 ? ' leader' : '');
-        if (animate) el.style.animationDelay = `${.1 + i * .07 + ti * .18}s`;
-        el.innerHTML = `<span class="dot"></span><span class="m-item__name">${name}</span>${i === 0 ? '<span class="leader-tag">팀장</span>' : ''}`;
-        list.appendChild(el);
-      });
-    });
-
+  function resetTeamCardsForReveal() {
+    document.getElementById('resultCard').classList.add('revealed');
     TEAM_IDS.forEach(t => {
-      const el = document.getElementById('res' + t);
-      el.classList.remove('pending');
-      const [leader, ...rest] = teams[t];
-      el.innerHTML = `
-        <div class="result-leader">
-          <span class="result-leader__name">${leader}</span>
-          <span class="result-leader__tag">팀장</span>
-        </div>
-        <div class="result-members">${rest.join(', ')}</div>
-      `;
+      const card = document.getElementById('card' + t);
+      card.classList.remove('show');
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(18px) scale(.97)';
+      document.getElementById('cnt' + t).textContent = '추첨 대기';
+      document.getElementById('list' + t).innerHTML = '<div class="empty"><span class="empty-icon">◌</span>아직 공개 전</div>';
+
+      const side = document.getElementById('res' + t);
+      side.className = 'result-val pending';
+      side.textContent = '대기중';
     });
+  }
+
+  function renderTeam(t, members, animate, teamIndex = 0) {
+    const card = document.getElementById('card' + t);
+    card.style.opacity = '';
+    card.style.transform = '';
+    if (animate) {
+      card.classList.remove('show');
+      void card.offsetWidth;
+      card.style.animationDelay = '0s';
+    }
+    card.classList.add('show');
+
+    document.getElementById('cnt' + t).textContent = `${members.length}명`;
+    const list = document.getElementById('list' + t);
+    list.innerHTML = '';
+    members.forEach((name, i) => {
+      const el = document.createElement('div');
+      el.className = 'm-item' + (i === 0 ? ' leader' : '');
+      if (animate) el.style.animationDelay = `${.08 + i * .08}s`;
+      el.innerHTML = `<span class="dot"></span><span class="m-item__name">${name}</span>${i === 0 ? '<span class="leader-tag">팀장</span>' : ''}`;
+      list.appendChild(el);
+    });
+
+    const side = document.getElementById('res' + t);
+    side.classList.remove('pending');
+    const [leader, ...rest] = members;
+    side.innerHTML = `
+      <div class="result-leader">
+        <span class="result-leader__name">${leader}</span>
+        <span class="result-leader__tag">팀장</span>
+      </div>
+      <div class="result-members">${rest.join(', ')}</div>
+    `;
+  }
+
+  function setRevealStage() {
+    const drawStage = document.getElementById('drawStage');
+    const nextTeam = pendingDraw ? TEAM_IDS[pendingDraw.nextIndex] : null;
+    if (!pendingDraw || !nextTeam) {
+      drawStage.classList.remove('show');
+      return;
+    }
+
+    drawStage.classList.add('show');
+    document.getElementById('drawStageKicker').textContent = `${nextTeam} TEAM READY`;
+    document.getElementById('drawStageText').textContent =
+      `${nextTeam}팀을 뽑을 차례입니다. 추첨기를 돌려 결과를 공개하세요.`;
+    document.getElementById('btnRevealNext').textContent = `${nextTeam}팀 뽑기`;
+  }
+
+  function renderLotterySlots(names, state) {
+    document.getElementById('lotterySlots').innerHTML = names
+      .map((name, i) => `<span class="lottery-slot is-${state}" style="animation-delay:${i * .04}s">${name}</span>`)
+      .join('');
+  }
+
+  function showLottery(team, members) {
+    const modal = document.getElementById('lotteryModal');
+    document.getElementById('lotteryEyebrow').textContent = `${team}팀 추첨 중`;
+    document.getElementById('lotteryTitle').textContent = '이름을 섞는 중';
+    document.getElementById('lotteryStatus').textContent = '후보가 빠르게 지나갑니다';
+    renderLotterySlots(members.map(() => '???'), 'spinning');
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden', 'false');
+
+    const slotCount = members.length;
+    let tick = 0;
+    return setInterval(() => {
+      const rolling = Array.from({ length: slotCount }, (_, i) => MEMBERS[(tick + i * 3 + Math.floor(Math.random() * MEMBERS.length)) % MEMBERS.length]);
+      renderLotterySlots(rolling, 'spinning');
+      tick += 1;
+    }, 95);
+  }
+
+  function hideLottery() {
+    const modal = document.getElementById('lotteryModal');
+    modal.classList.remove('show');
+    modal.setAttribute('aria-hidden', 'true');
+  }
+
+  function finishSequentialDraw() {
+    if (!pendingDraw) return;
+    const { teams, drawnAt } = pendingDraw;
+    pendingDraw = null;
+    appState = 'done';
+    localStorage.setItem(STORE_KEY, JSON.stringify({ teams, drawnAt, selectedMembers }));
+    localStorage.setItem(SESSION_KEY, STATIC_SESSION_ID);
+    document.getElementById('drawStage').classList.remove('show');
+    document.getElementById('selectedCount').textContent = `${selectedMembers.length}명 배치`;
+    document.getElementById('selectionMeta').innerHTML =
+      `<strong>${selectedMembers.length}명</strong> 배치 완료 → ${teamSizeText(selectedMembers.length)}`;
+    document.getElementById('headerSub').textContent =
+      `${selectedMembers.length}명을 A · B · C 세 팀으로 배치했습니다`;
+    document.getElementById('drawTime').textContent = fmtDate(drawnAt);
+    document.getElementById('drawDone').classList.add('show');
+  }
+
+  function revealNextTeam() {
+    if (!pendingDraw) return;
+    const team = TEAM_IDS[pendingDraw.nextIndex];
+    if (!team) return;
+    const members = pendingDraw.teams[team];
+    document.getElementById('drawStage').classList.remove('show');
+    const rollingTimer = showLottery(team, members);
+
+    setTimeout(() => {
+      clearInterval(rollingTimer);
+      document.getElementById('lotteryTitle').textContent = `${team}팀 확정`;
+      document.getElementById('lotteryStatus').textContent = '결과를 공개합니다';
+      renderLotterySlots(members, 'final');
+    }, 1250);
+
+    setTimeout(() => {
+      hideLottery();
+      renderTeam(team, members, true, pendingDraw.nextIndex);
+      pendingDraw.nextIndex += 1;
+      if (pendingDraw.nextIndex >= TEAM_IDS.length) {
+        finishSequentialDraw();
+      } else {
+        setRevealStage();
+      }
+    }, 2200);
+  }
+
+  function revealAllTeams() {
+    if (!pendingDraw) return;
+    TEAM_IDS.forEach((t, i) => renderTeam(t, pendingDraw.teams[t], true, i));
+    finishSequentialDraw();
+  }
+
+  function prepareSequentialDraw(teams, drawnAt) {
+    appState = 'revealing';
+    const placedCount = TEAM_IDS.reduce((sum, t) => sum + teams[t].length, 0);
+    pendingDraw = { teams, drawnAt, nextIndex: 0 };
+    lockSelectionForDraw(placedCount, teams);
+    resetTeamCardsForReveal();
+    document.getElementById('headerSub').textContent = 'A팀부터 한 팀씩 추첨합니다';
+    document.getElementById('ctaModes').style.display = 'none';
+    document.getElementById('manualGuide').classList.remove('show');
+    document.getElementById('drawDone').classList.remove('show');
+    setRevealStage();
+  }
+
+  function applyResults(teams, drawnAt, animate) {
+    appState = 'done';
+    const placedCount = TEAM_IDS.reduce((sum, t) => sum + teams[t].length, 0);
+
+    lockSelectionForDraw(placedCount, teams);
+    document.getElementById('selectedCount').textContent = `${placedCount}명 배치`;
+    document.getElementById('selectionMeta').innerHTML =
+      `<strong>${placedCount}명</strong> 배치 완료 → ${teamSizeText(placedCount)}`;
+    document.getElementById('headerSub').textContent =
+      `${placedCount}명을 A · B · C 세 팀으로 배치했습니다`;
+
+    TEAM_IDS.forEach((t, ti) => renderTeam(t, teams[t], animate, ti));
     document.getElementById('resultCard').classList.add('revealed');
 
     document.getElementById('ctaModes').style.display    = 'none';
     document.getElementById('manualGuide').classList.remove('show');
+    document.getElementById('drawStage').classList.remove('show');
     document.getElementById('drawTime').textContent = fmtDate(drawnAt);
     document.getElementById('drawDone').classList.add('show');
   }
@@ -1071,16 +1420,6 @@
     btnAuto.disabled = true;
     btnAuto.textContent = '🎲 섞는 중…';
 
-    document.getElementById('resultCard').classList.remove('revealed');
-    TEAM_IDS.forEach(t => {
-      const card = document.getElementById('card' + t);
-      card.classList.remove('show');
-      card.style.opacity = '0';
-      card.style.transform = 'translateY(18px) scale(.97)';
-      document.getElementById('list' + t).innerHTML = skeletonHTML();
-      document.getElementById('cnt' + t).textContent = '분배 중…';
-    });
-
     setTimeout(() => {
       const s = shuffle(selectedMembers);
       const sizes = getTeamSizes(s.length);
@@ -1091,8 +1430,8 @@
         cursor += sizes[t];
       });
       const drawnAt = new Date().toISOString();
-      saveAndApply(teams, drawnAt, true);
-    }, 650);
+      prepareSequentialDraw(teams, drawnAt);
+    }, 420);
   }
 
   // ── 수동 선택 모드 시작 ──
@@ -1182,16 +1521,6 @@
     document.getElementById('btnStartDraw').disabled = true;
     document.getElementById('btnStartDraw').textContent = '🎯 배치 중…';
 
-    document.getElementById('resultCard').classList.remove('revealed');
-    TEAM_IDS.forEach(t => {
-      const card = document.getElementById('card' + t);
-      card.classList.remove('show');
-      card.style.opacity = '0';
-      card.style.transform = 'translateY(18px) scale(.97)';
-      document.getElementById('list' + t).innerHTML = skeletonHTML();
-      document.getElementById('cnt' + t).textContent = '분배 중…';
-    });
-
     setTimeout(() => {
       const leaderSet = new Set(Object.values(selectedLeaders));
       const remaining = shuffle(selectedMembers.filter(m => !leaderSet.has(m)));
@@ -1204,8 +1533,8 @@
         cursor += memberCount;
       });
       const drawnAt = new Date().toISOString();
-      saveAndApply(teams, drawnAt, true);
-    }, 650);
+      prepareSequentialDraw(teams, drawnAt);
+    }, 420);
   });
 
   function saveAndApply(teams, drawnAt, animate) {
@@ -1234,6 +1563,16 @@
   document.getElementById('btnManual').addEventListener('click', e => {
     e.preventDefault();
     startManualMode();
+  });
+
+  document.getElementById('btnRevealNext').addEventListener('click', e => {
+    e.preventDefault();
+    revealNextTeam();
+  });
+
+  document.getElementById('btnRevealAll').addEventListener('click', e => {
+    e.preventDefault();
+    revealAllTeams();
   });
 
   document.getElementById('btnReset').addEventListener('click', () => {
