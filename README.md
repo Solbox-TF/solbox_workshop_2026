@@ -19,7 +19,7 @@ npm run start:recreation
 
 - 팀 배치 도구: http://localhost:1140
 - 레크 게임: http://localhost:4173
-- 배포된 레크 게임: https://d1rp35iwn804lt.cloudfront.net
+- 배포된 레크 게임: https://game.ollida.kr
 
 ## 배포
 
