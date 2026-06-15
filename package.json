@@ -5,6 +5,13 @@
   "scripts": {
     "start:team": "node apps/team-picker/server.js",
     "start:recreation": "node apps/recreation-games/server.js",
+    "diff": "sst diff",
+    "deploy": "sst deploy",
+    "deploy:aws": "sst deploy --stage production",
+    "remove:aws": "sst remove --stage production",
     "check": "node --check apps/team-picker/server.js && node --check apps/recreation-games/server.js && node --check apps/recreation-games/app.js && node --check apps/recreation-games/game.js && node --check apps/recreation-games/games-data.js"
+  },
+  "devDependencies": {
+    "sst": "^4.15.2"
   }
 }

@@ -19,5 +19,20 @@ npm run start:recreation
 
 - 팀 배치 도구: http://localhost:1140
 - 레크 게임: http://localhost:4173
+- 배포된 레크 게임: https://d1rp35iwn804lt.cloudfront.net
+
+## 배포
+
+레크 게임은 SST `StaticSite`로 S3 + CloudFront에 배포한다.
+
+```bash
+AWS_PROFILE=<profile> npm run deploy:aws
+```
+
+배포 전 변경사항 확인:
+
+```bash
+AWS_PROFILE=<profile> npm run diff -- --stage production
+```
 
 > Node.js 18 이상 필요. 별도 패키지 설치 없이 바로 실행 가능하다.
