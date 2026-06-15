@@ -266,6 +266,35 @@
       transition: color .2s, border-color .2s, background .2s;
       user-select: none;
     }
+    .chip.pickable {
+      cursor: pointer;
+      color: rgba(255,255,255,.86);
+      border-color: rgba(255,255,255,.20);
+      background: rgba(255,255,255,.08);
+    }
+    .chip.pickable:hover {
+      border-color: rgba(255,255,255,.35);
+      background: rgba(255,255,255,.12);
+    }
+    .chip.unpicked {
+      cursor: pointer;
+      color: rgba(255,255,255,.30);
+      border-color: rgba(255,255,255,.06);
+      background: rgba(255,255,255,.015);
+      text-decoration: line-through;
+      text-decoration-thickness: 1px;
+      text-decoration-color: rgba(255,255,255,.28);
+    }
+    .chip.unpicked:hover {
+      color: rgba(255,255,255,.58);
+      border-color: rgba(255,255,255,.16);
+      background: rgba(255,255,255,.04);
+    }
+    .chip.locked {
+      color: rgba(255,255,255,.24);
+      border-color: rgba(255,255,255,.05);
+      background: rgba(255,255,255,.015);
+    }
     .chip.on {
       color: var(--txt);
       border-color: var(--border-h);
@@ -309,6 +338,62 @@
       margin-left: 4px;
       background: rgba(255,255,255,.15);
       letter-spacing: .04em;
+    }
+
+    .selection-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .selection-meta {
+      color: var(--txt-2);
+      font-size: .78rem;
+      line-height: 1.45;
+    }
+    .selection-meta strong {
+      color: var(--txt);
+      font-weight: 700;
+    }
+    .selection-tools {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .utility-btn {
+      padding: 7px 11px;
+      border-radius: var(--r-sm);
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.62);
+      font: 700 .72rem/1 'Pretendard Variable', Pretendard, sans-serif;
+      cursor: pointer;
+      transition: background .15s, color .15s, border-color .15s;
+    }
+    .utility-btn:hover {
+      background: rgba(255,255,255,.08);
+      border-color: rgba(255,255,255,.20);
+      color: var(--txt);
+    }
+    .selection-error {
+      min-height: 18px;
+      margin-top: 8px;
+      color: #fca5a5;
+      font-size: .76rem;
+      font-weight: 600;
+    }
+    @media (max-width: 640px) {
+      .selection-bar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      .selection-tools {
+        width: 100%;
+      }
+      .utility-btn {
+        flex: 1;
+      }
     }
 
     /* === Mode Buttons === */
@@ -711,12 +796,20 @@
     <header class="header">
       <div class="header__eyebrow">⚡ SOLBOX WORKSHOP 2026</div>
       <h1 class="header__title">팀 뽑기</h1>
-      <p class="header__sub">14명을 A · B · C 세 팀으로 랜덤 분배합니다 (5 · 5 · 4)</p>
+      <p class="header__sub" id="headerSub">참가자를 선택한 뒤 A · B · C 세 팀으로 랜덤 분배합니다</p>
     </header>
 
     <section class="members-box">
-      <div class="section-label">전체 참가자 · 14명</div>
+      <div class="section-label">참가자 선택 · <span id="selectedCount">14명 선택</span></div>
       <div class="chips" id="chips"></div>
+      <div class="selection-bar">
+        <div class="selection-meta" id="selectionMeta"></div>
+        <div class="selection-tools">
+          <button class="utility-btn" id="btnSelectAll" type="button">전체 선택</button>
+          <button class="utility-btn" id="btnClearSelection" type="button">전체 해제</button>
+        </div>
+      </div>
+      <div class="selection-error" id="selectionError"></div>
     </section>
 
     <!-- 모드 선택 버튼 2개 -->
@@ -805,21 +898,75 @@
   ];
   const STORE_KEY   = 'solbox_teamdraw_2026';
   const SESSION_KEY = 'solbox_session_2026';
+  const TEAM_IDS = ['A','B','C'];
+  let selectedMembers = [...MEMBERS];
 
   // 수동 선택 상태
-  // 'idle' | 'manual-A' | 'manual-B' | 'manual-C' | 'manual-ready' | 'done'
-  let appState = 'idle';
+  // 'selecting' | 'manual-A' | 'manual-B' | 'manual-C' | 'manual-ready' | 'done'
+  let appState = 'selecting';
   const selectedLeaders = { A: null, B: null, C: null };
 
   // 멤버 칩 초기 렌더링
   const chipsEl = document.getElementById('chips');
   MEMBERS.forEach(name => {
     const el = document.createElement('span');
-    el.className = 'chip';
+    el.className = 'chip pickable';
     el.id = 'chip-' + name;
+    el.dataset.name = name;
     el.textContent = name;
     chipsEl.appendChild(el);
   });
+
+  function getTeamSizes(count) {
+    const base = Math.floor(count / 3);
+    const extra = count % 3;
+    return {
+      A: base + (extra > 0 ? 1 : 0),
+      B: base + (extra > 1 ? 1 : 0),
+      C: base,
+    };
+  }
+
+  function teamSizeText(count) {
+    const sizes = getTeamSizes(count);
+    return `A ${sizes.A}명 · B ${sizes.B}명 · C ${sizes.C}명`;
+  }
+
+  function canDraw() {
+    return selectedMembers.length >= 3;
+  }
+
+  function updateSelectionUI() {
+    const selectedSet = new Set(selectedMembers);
+    MEMBERS.forEach(name => {
+      const el = document.getElementById('chip-' + name);
+      el.className = 'chip ' + (selectedSet.has(name) ? 'pickable' : 'unpicked');
+      el.textContent = name;
+    });
+
+    const count = selectedMembers.length;
+    document.getElementById('selectedCount').textContent = `${count}명 선택`;
+    document.getElementById('selectionMeta').innerHTML =
+      count > 0
+        ? `<strong>${count}명</strong> 선택됨 → ${teamSizeText(count)}`
+        : '참가자를 선택해주세요';
+    document.getElementById('headerSub').textContent =
+      canDraw()
+        ? `${count}명을 A · B · C 세 팀으로 랜덤 분배합니다 (${teamSizeText(count)})`
+        : '팀 뽑기를 시작하려면 참가자 3명 이상을 선택해주세요';
+    document.getElementById('selectionError').textContent =
+      canDraw() ? '' : '3명 이상 선택해야 팀을 만들 수 있습니다.';
+    document.getElementById('btnAuto').disabled = !canDraw();
+    document.getElementById('btnManual').disabled = !canDraw();
+  }
+
+  function toggleMember(name) {
+    const next = selectedMembers.includes(name)
+      ? selectedMembers.filter(member => member !== name)
+      : [...selectedMembers, name];
+    selectedMembers = MEMBERS.filter(member => next.includes(member));
+    updateSelectionUI();
+  }
 
   function shuffle(arr) {
     const a = [...arr];
@@ -845,16 +992,32 @@
 
   function applyResults(teams, drawnAt, animate) {
     appState = 'done';
+    const placedCount = TEAM_IDS.reduce((sum, t) => sum + teams[t].length, 0);
 
-    ['A','B','C'].forEach(t =>
+    document.getElementById('selectedCount').textContent = `${placedCount}명 배치`;
+    document.getElementById('selectionMeta').innerHTML =
+      `<strong>${placedCount}명</strong> 배치 완료 → ${teamSizeText(placedCount)}`;
+    document.getElementById('selectionError').textContent = '';
+    document.getElementById('headerSub').textContent =
+      `${placedCount}명을 A · B · C 세 팀으로 배치했습니다`;
+    document.getElementById('btnSelectAll').disabled = true;
+    document.getElementById('btnClearSelection').disabled = true;
+
+    MEMBERS.forEach(name => {
+      const el = document.getElementById('chip-' + name);
+      el.className = 'chip locked';
+      el.textContent = name;
+    });
+    TEAM_IDS.forEach(t =>
       teams[t].forEach(n => {
         const el = document.getElementById('chip-' + n);
+        if (!el) return;
         el.className = 'chip on';
         el.textContent = n;
       })
     );
 
-    ['A','B','C'].forEach((t, ti) => {
+    TEAM_IDS.forEach((t, ti) => {
       const card = document.getElementById('card' + t);
       card.style.opacity = '';
       card.style.transform = '';
@@ -877,7 +1040,7 @@
       });
     });
 
-    ['A','B','C'].forEach(t => {
+    TEAM_IDS.forEach(t => {
       const el = document.getElementById('res' + t);
       el.classList.remove('pending');
       const [leader, ...rest] = teams[t];
@@ -899,12 +1062,16 @@
 
   // ── 자동 뽑기 ──
   function drawAuto() {
+    if (!canDraw()) {
+      updateSelectionUI();
+      return;
+    }
     const btnAuto = document.getElementById('btnAuto');
     btnAuto.disabled = true;
     btnAuto.textContent = '🎲 섞는 중…';
 
     document.getElementById('resultCard').classList.remove('revealed');
-    ['A','B','C'].forEach(t => {
+    TEAM_IDS.forEach(t => {
       const card = document.getElementById('card' + t);
       card.classList.remove('show');
       card.style.opacity = '0';
@@ -914,8 +1081,14 @@
     });
 
     setTimeout(() => {
-      const s = shuffle(MEMBERS);
-      const teams = { A: s.slice(0,5), B: s.slice(5,10), C: s.slice(10,14) };
+      const s = shuffle(selectedMembers);
+      const sizes = getTeamSizes(s.length);
+      const teams = {};
+      let cursor = 0;
+      TEAM_IDS.forEach(t => {
+        teams[t] = s.slice(cursor, cursor + sizes[t]);
+        cursor += sizes[t];
+      });
       const drawnAt = new Date().toISOString();
       saveAndApply(teams, drawnAt, true);
     }, 650);
@@ -923,11 +1096,21 @@
 
   // ── 수동 선택 모드 시작 ──
   function startManualMode() {
+    if (!canDraw()) {
+      updateSelectionUI();
+      return;
+    }
+    TEAM_IDS.forEach(t => selectedLeaders[t] = null);
     appState = 'manual-A';
     document.getElementById('ctaModes').style.display = 'none';
     document.getElementById('manualGuide').classList.add('show');
     updateManualGuide();
-    document.querySelectorAll('.chip').forEach(el => el.classList.add('selectable'));
+    const selectedSet = new Set(selectedMembers);
+    document.querySelectorAll('.chip').forEach(el => {
+      const name = el.dataset.name;
+      el.className = selectedSet.has(name) ? 'chip selectable' : 'chip locked';
+      el.textContent = name;
+    });
   }
 
   function updateManualGuide() {
@@ -939,7 +1122,7 @@
     };
     document.getElementById('manualStep').textContent = stepTexts[appState] || '';
 
-    ['A','B','C'].forEach(t => {
+    TEAM_IDS.forEach(t => {
       const mlb   = document.getElementById('mlb' + t);
       const nameEl = document.getElementById('mlbName' + t);
       mlb.classList.remove('active-slot', 'filled');
@@ -956,7 +1139,7 @@
 
     // 현재 선택 중인 팀 슬롯 강조
     const activeTeam = appState.split('-')[1]; // 'A', 'B', 'C'
-    if (activeTeam && ['A','B','C'].includes(activeTeam) && !selectedLeaders[activeTeam]) {
+    if (activeTeam && TEAM_IDS.includes(activeTeam) && !selectedLeaders[activeTeam]) {
       document.getElementById('mlb' + activeTeam).classList.add('active-slot');
     }
 
@@ -967,13 +1150,20 @@
   // 칩 클릭 핸들러 (수동 모드)
   chipsEl.addEventListener('click', e => {
     const chip = e.target.closest('.chip');
-    if (!chip || !chip.classList.contains('selectable')) return;
+    if (!chip) return;
+
+    const name = chip.dataset.name;
+    if (appState === 'selecting') {
+      toggleMember(name);
+      return;
+    }
+
+    if (!chip.classList.contains('selectable')) return;
 
     const teamOrder = { 'manual-A': 'A', 'manual-B': 'B', 'manual-C': 'C' };
     const team = teamOrder[appState];
     if (!team) return;
 
-    const name = chip.id.replace('chip-', '');
     selectedLeaders[team] = name;
 
     // 칩 스타일 변경
@@ -992,7 +1182,7 @@
     document.getElementById('btnStartDraw').textContent = '🎯 배치 중…';
 
     document.getElementById('resultCard').classList.remove('revealed');
-    ['A','B','C'].forEach(t => {
+    TEAM_IDS.forEach(t => {
       const card = document.getElementById('card' + t);
       card.classList.remove('show');
       card.style.opacity = '0';
@@ -1003,22 +1193,37 @@
 
     setTimeout(() => {
       const leaderSet = new Set(Object.values(selectedLeaders));
-      const remaining = shuffle(MEMBERS.filter(m => !leaderSet.has(m)));
-      const teams = {
-        A: [selectedLeaders.A, ...remaining.slice(0, 4)],
-        B: [selectedLeaders.B, ...remaining.slice(4, 8)],
-        C: [selectedLeaders.C, ...remaining.slice(8, 11)],
-      };
+      const remaining = shuffle(selectedMembers.filter(m => !leaderSet.has(m)));
+      const sizes = getTeamSizes(selectedMembers.length);
+      const teams = {};
+      let cursor = 0;
+      TEAM_IDS.forEach(t => {
+        const memberCount = Math.max(sizes[t] - 1, 0);
+        teams[t] = [selectedLeaders[t], ...remaining.slice(cursor, cursor + memberCount)];
+        cursor += memberCount;
+      });
       const drawnAt = new Date().toISOString();
       saveAndApply(teams, drawnAt, true);
     }, 650);
   });
 
   function saveAndApply(teams, drawnAt, animate) {
-    localStorage.setItem(STORE_KEY, JSON.stringify({ teams, drawnAt }));
+    localStorage.setItem(STORE_KEY, JSON.stringify({ teams, drawnAt, selectedMembers }));
     fetch('/api/session').then(r => r.json()).then(({ id }) => localStorage.setItem(SESSION_KEY, id));
     applyResults(teams, drawnAt, animate);
   }
+
+  document.getElementById('btnSelectAll').addEventListener('click', () => {
+    if (appState !== 'selecting') return;
+    selectedMembers = [...MEMBERS];
+    updateSelectionUI();
+  });
+
+  document.getElementById('btnClearSelection').addEventListener('click', () => {
+    if (appState !== 'selecting') return;
+    selectedMembers = [];
+    updateSelectionUI();
+  });
 
   document.getElementById('btnAuto').addEventListener('click', e => {
     e.preventDefault();
@@ -1048,7 +1253,10 @@
       const saved = localStorage.getItem(STORE_KEY);
       if (saved) {
         try {
-          const { teams, drawnAt } = JSON.parse(saved);
+          const { teams, drawnAt, selectedMembers: savedMembers } = JSON.parse(saved);
+          if (Array.isArray(savedMembers)) {
+            selectedMembers = MEMBERS.filter(member => savedMembers.includes(member));
+          }
           applyResults(teams, drawnAt, false);
         } catch (_) {
           localStorage.removeItem(STORE_KEY);
@@ -1059,11 +1267,16 @@
       const saved = localStorage.getItem(STORE_KEY);
       if (saved) {
         try {
-          const { teams, drawnAt } = JSON.parse(saved);
+          const { teams, drawnAt, selectedMembers: savedMembers } = JSON.parse(saved);
+          if (Array.isArray(savedMembers)) {
+            selectedMembers = MEMBERS.filter(member => savedMembers.includes(member));
+          }
           applyResults(teams, drawnAt, false);
         } catch (_) { localStorage.removeItem(STORE_KEY); }
       }
     });
+
+  updateSelectionUI();
 </script>
 </body>
 </html>
