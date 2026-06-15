@@ -1,0 +1,10 @@
+{
+  "name": "solbox-workshop-2026",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start:team": "node apps/team-picker/server.js",
+    "start:recreation": "node apps/recreation-games/server.js",
+    "check": "node --check apps/team-picker/server.js && node --check apps/recreation-games/server.js && node --check apps/recreation-games/app.js && node --check apps/recreation-games/game.js && node --check apps/recreation-games/games-data.js"
+  }
+}

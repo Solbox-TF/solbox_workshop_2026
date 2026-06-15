@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>레크 게임 선택판</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero" aria-labelledby="page-title">
+        <div class="hero__media" aria-hidden="true"></div>
+        <div class="hero__content">
+          <p class="eyebrow">variety games · category mode</p>
+          <h1 id="page-title">레크 게임 선택판</h1>
+          <p class="intro">게임을 고르고, 번호를 누르고, 필요한 순간에 정답과 진행 팁을 열어보세요.</p>
+          <div class="hero__actions" aria-label="빠른 조작">
+            <button class="primary-action" id="randomQuestion" type="button">
+              <span aria-hidden="true">↯</span>
+              랜덤 문제
+            </button>
+            <a class="screen-link" id="heroGameScreenLink" href="game.html">
+              <span aria-hidden="true">▣</span>
+              게임 화면
+            </a>
+            <button class="secondary-action" id="resetScores" type="button">
+              <span aria-hidden="true">↺</span>
+              점수 초기화
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="game-tabs" id="gameTabs" aria-label="게임 선택"></section>
+
+      <section class="console" aria-label="게임 진행 콘솔">
+        <aside class="score-panel" aria-labelledby="score-title">
+          <div class="panel-heading">
+            <p class="eyebrow">score</p>
+            <h2 id="score-title">팀 점수판</h2>
+          </div>
+          <div class="score-grid" id="scoreGrid"></div>
+          <p class="score-note">정답은 +10, 몸으로 말해요는 맞힌 개수만큼 눌러 더하면 됩니다.</p>
+        </aside>
+
+        <section class="question-bank" aria-labelledby="bank-title">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow" id="bankKicker">줄줄이 말해요</p>
+              <h2 id="bank-title">문제 선택</h2>
+            </div>
+            <span class="count-badge" id="questionCount">20문제</span>
+          </div>
+          <div class="category-grid" id="categoryGrid" aria-label="주제 선택"></div>
+          <div class="question-grid" id="questionGrid"></div>
+        </section>
+
+        <section class="question-detail" aria-live="polite" aria-labelledby="detail-title">
+          <div class="detail-top">
+            <div>
+              <p class="eyebrow" id="detailKicker">QUESTION 01</p>
+              <h2 id="detail-title">문제 상세</h2>
+            </div>
+            <div class="detail-actions">
+              <span class="count-badge" id="scoreBadge">10점</span>
+              <a class="screen-link screen-link--small" id="currentGameScreenLink" href="game.html">
+                <span aria-hidden="true">▣</span>
+                현재 문제 화면
+              </a>
+            </div>
+          </div>
+
+          <article class="prompt-card">
+            <p class="prompt-label" id="promptLabel">문제</p>
+            <p class="prompt-text" id="promptText"></p>
+          </article>
+
+          <div class="detail-grid">
+            <article class="info-card">
+              <h3>진행 방식</h3>
+              <ul class="rule-list" id="ruleList"></ul>
+            </article>
+
+            <article class="answer-card">
+              <div class="answer-card__top">
+                <div>
+                  <p class="eyebrow">host only</p>
+                  <h3 id="answerTitle">정답 / 팁</h3>
+                </div>
+                <button class="icon-button" id="toggleAnswer" type="button" aria-expanded="false">
+                  <span aria-hidden="true">◐</span>
+                  보기
+                </button>
+              </div>
+              <div class="answer-content is-hidden" id="answerContent"></div>
+            </article>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="games-data.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

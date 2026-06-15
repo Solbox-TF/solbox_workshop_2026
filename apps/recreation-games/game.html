@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>게임 화면</title>
+    <link rel="stylesheet" href="game.css" />
+  </head>
+  <body>
+    <main class="stage">
+      <header class="stage-top">
+        <a class="back-link" id="backLink" href="index.html">
+          <span aria-hidden="true">‹</span>
+          진행자 콘솔
+        </a>
+        <nav class="game-switcher" id="gameSwitcher" aria-label="게임 선택"></nav>
+        <nav class="category-switcher" id="categorySwitcher" aria-label="주제 선택"></nav>
+      </header>
+
+      <section class="screen" aria-live="polite" aria-labelledby="gameTitle">
+        <div class="screen__meta">
+          <p class="eyebrow" id="gameType">GAME</p>
+          <p class="question-number" id="questionNumber">01</p>
+        </div>
+
+        <div class="screen__main">
+          <p class="prompt-label" id="promptLabel">문제</p>
+          <h1 id="gameTitle">줄줄이 말해요</h1>
+          <p class="stage-prompt" id="stagePrompt"></p>
+        </div>
+
+        <div class="answer-panel is-hidden" id="answerPanel">
+          <p class="answer-label">정답</p>
+          <p class="answer-text" id="answerText"></p>
+          <p class="answer-tip" id="answerTip"></p>
+        </div>
+      </section>
+
+      <section class="control-deck" aria-label="게임 조작">
+        <div class="question-strip" id="questionStrip"></div>
+
+        <div class="stage-actions">
+          <button class="stage-button stage-button--start" id="startGame" type="button">
+            <span aria-hidden="true">▶</span>
+            1번 문제 시작
+          </button>
+          <button class="stage-button" id="prevQuestion" type="button">
+            <span aria-hidden="true">‹</span>
+            이전
+          </button>
+          <button class="stage-button stage-button--primary" id="toggleAnswer" type="button" aria-expanded="false">
+            <span aria-hidden="true">◐</span>
+            정답 보기
+          </button>
+          <button class="stage-button" id="nextQuestion" type="button">
+            다음
+            <span aria-hidden="true">›</span>
+          </button>
+          <button class="stage-button" id="randomQuestion" type="button">
+            <span aria-hidden="true">↯</span>
+            랜덤
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <script src="games-data.js"></script>
+    <script src="game.js"></script>
+  </body>
+</html>
