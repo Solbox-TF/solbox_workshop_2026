@@ -814,13 +814,15 @@
     }
     .lottery-ball {
       transform-origin: 160px 134px;
-      animation: ballSpin 1.35s linear infinite;
+      animation: ballSpin .82s linear infinite;
     }
-    .lottery-ball:nth-of-type(2) { animation-duration: 1.1s; animation-delay: -.2s; }
-    .lottery-ball:nth-of-type(3) { animation-duration: 1.55s; animation-delay: -.45s; }
-    .lottery-ball:nth-of-type(4) { animation-duration: 1.25s; animation-delay: -.65s; }
-    .lottery-ball:nth-of-type(5) { animation-duration: 1.7s; animation-delay: -.3s; }
-    .lottery-ball:nth-of-type(6) { animation-duration: 1.18s; animation-delay: -.8s; }
+    .lottery-ball:nth-of-type(2) { animation-duration: .66s; animation-delay: -.2s; }
+    .lottery-ball:nth-of-type(3) { animation-duration: .92s; animation-delay: -.45s; }
+    .lottery-ball:nth-of-type(4) { animation-duration: .74s; animation-delay: -.65s; }
+    .lottery-ball:nth-of-type(5) { animation-duration: 1s; animation-delay: -.3s; }
+    .lottery-ball:nth-of-type(6) { animation-duration: .7s; animation-delay: -.8s; }
+    .lottery-ball:nth-of-type(7) { animation-duration: .86s; animation-delay: -.15s; }
+    .lottery-ball:nth-of-type(8) { animation-duration: .62s; animation-delay: -.55s; }
     @keyframes ballSpin {
       from { transform: rotate(0deg) translateX(22px) rotate(0deg); }
       to   { transform: rotate(360deg) translateX(22px) rotate(-360deg); }
@@ -864,6 +866,27 @@
       border-color: rgba(255,255,255,.56);
       color: #160f05;
       box-shadow: 0 12px 28px rgba(251,191,36,.24);
+    }
+    .lottery-confirm {
+      display: none;
+      min-width: 136px;
+      height: 46px;
+      align-items: center;
+      justify-content: center;
+      margin: 20px auto 0;
+      border: 1px solid rgba(251,191,36,.52);
+      border-radius: var(--r-md);
+      background: linear-gradient(135deg, rgba(251,191,36,.97), rgba(245,158,11,.97));
+      color: #160f05;
+      font: 900 1rem/1 'Pretendard Variable', Pretendard, sans-serif;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(251,191,36,.22);
+      transition: transform .15s, box-shadow .15s;
+    }
+    .lottery-confirm.show { display: inline-flex; }
+    .lottery-confirm:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 18px 36px rgba(251,191,36,.3);
     }
     @keyframes slotPop {
       from { opacity: 0; transform: translateY(10px) scale(.8); }
@@ -1096,12 +1119,15 @@
         <circle class="lottery-ball" cx="132" cy="145" r="15" fill="#fbbf24" />
         <circle class="lottery-ball" cx="166" cy="154" r="14" fill="#fb7185" />
         <circle class="lottery-ball" cx="144" cy="118" r="13" fill="#38bdf8" />
+        <circle class="lottery-ball" cx="184" cy="108" r="13" fill="#f97316" />
+        <circle class="lottery-ball" cx="110" cy="123" r="12" fill="#a3e635" />
       </g>
       <path d="M226 122h58c13 0 24 11 24 24s-11 24-24 24h-40" fill="none" stroke="url(#goldTube)" stroke-width="16" stroke-linecap="round" />
       <circle cx="286" cy="146" r="15" fill="#fff7ed" stroke="#f59e0b" stroke-width="5" />
     </svg>
     <div class="lottery-slots" id="lotterySlots"></div>
     <p class="lottery-status" id="lotteryStatus">잠시만요, 공이 굴러가고 있어요</p>
+    <button class="lottery-confirm" id="lotteryConfirm" type="button">확인</button>
   </div>
 </div>
 
@@ -1117,6 +1143,7 @@
   const TEAM_IDS = ['A','B','C'];
   let selectedMembers = [...MEMBERS];
   let pendingDraw = null;
+  let pendingLotteryResult = null;
 
   // 수동 선택 상태
   // 'selecting' | 'manual-A' | 'manual-B' | 'manual-C' | 'manual-ready' | 'revealing' | 'done'
@@ -1304,26 +1331,38 @@
 
   function showLottery(team, members) {
     const modal = document.getElementById('lotteryModal');
+    const confirmButton = document.getElementById('lotteryConfirm');
     document.getElementById('lotteryEyebrow').textContent = `${team}팀 추첨 중`;
-    document.getElementById('lotteryTitle').textContent = '이름을 섞는 중';
-    document.getElementById('lotteryStatus').textContent = '후보가 빠르게 지나갑니다';
-    renderLotterySlots(members.map(() => '???'), 'spinning');
+    document.getElementById('lotteryTitle').textContent = '공을 섞는 중';
+    document.getElementById('lotteryStatus').textContent = '공이 빠르게 굴러갑니다';
+    confirmButton.classList.remove('show');
+    confirmButton.disabled = true;
+    renderLotterySlots([], 'spinning');
     modal.classList.add('show');
     modal.setAttribute('aria-hidden', 'false');
-
-    const slotCount = members.length;
-    let tick = 0;
-    return setInterval(() => {
-      const rolling = Array.from({ length: slotCount }, (_, i) => MEMBERS[(tick + i * 3 + Math.floor(Math.random() * MEMBERS.length)) % MEMBERS.length]);
-      renderLotterySlots(rolling, 'spinning');
-      tick += 1;
-    }, 95);
   }
 
   function hideLottery() {
     const modal = document.getElementById('lotteryModal');
+    const confirmButton = document.getElementById('lotteryConfirm');
+    confirmButton.classList.remove('show');
+    confirmButton.disabled = true;
     modal.classList.remove('show');
     modal.setAttribute('aria-hidden', 'true');
+  }
+
+  function confirmLotteryResult() {
+    if (!pendingDraw || !pendingLotteryResult) return;
+    const { team, members, index } = pendingLotteryResult;
+    pendingLotteryResult = null;
+    hideLottery();
+    renderTeam(team, members, true, index);
+    pendingDraw.nextIndex = index + 1;
+    if (pendingDraw.nextIndex >= TEAM_IDS.length) {
+      finishSequentialDraw();
+    } else {
+      setRevealStage();
+    }
   }
 
   function finishSequentialDraw() {
@@ -1349,25 +1388,17 @@
     if (!team) return;
     const members = pendingDraw.teams[team];
     document.getElementById('drawStage').classList.remove('show');
-    const rollingTimer = showLottery(team, members);
+    showLottery(team, members);
 
     setTimeout(() => {
-      clearInterval(rollingTimer);
       document.getElementById('lotteryTitle').textContent = `${team}팀 확정`;
       document.getElementById('lotteryStatus').textContent = '결과를 공개합니다';
       renderLotterySlots(members, 'final');
+      pendingLotteryResult = { team, members, index: pendingDraw.nextIndex };
+      const confirmButton = document.getElementById('lotteryConfirm');
+      confirmButton.disabled = false;
+      confirmButton.classList.add('show');
     }, 1250);
-
-    setTimeout(() => {
-      hideLottery();
-      renderTeam(team, members, true, pendingDraw.nextIndex);
-      pendingDraw.nextIndex += 1;
-      if (pendingDraw.nextIndex >= TEAM_IDS.length) {
-        finishSequentialDraw();
-      } else {
-        setRevealStage();
-      }
-    }, 2200);
   }
 
   function revealAllTeams() {
@@ -1573,6 +1604,11 @@
   document.getElementById('btnRevealAll').addEventListener('click', e => {
     e.preventDefault();
     revealAllTeams();
+  });
+
+  document.getElementById('lotteryConfirm').addEventListener('click', e => {
+    e.preventDefault();
+    confirmLotteryResult();
   });
 
   document.getElementById('btnReset').addEventListener('click', () => {
