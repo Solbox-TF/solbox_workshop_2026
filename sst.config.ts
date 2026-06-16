@@ -57,6 +57,8 @@ export default $config({
 
     questionsApi.route("GET /questions", questionsHandler);
     questionsApi.route("PUT /questions", questionsHandler);
+    questionsApi.route("GET /scores", questionsHandler);
+    questionsApi.route("PUT /scores", questionsHandler);
 
     const recreationGames = new sst.aws.StaticSite("RecreationGames", {
       path: "apps/recreation-games",

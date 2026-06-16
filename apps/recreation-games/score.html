@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>점수 입력판</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="score.css" />
+  </head>
+  <body>
+    <main class="score-shell">
+      <header class="score-top">
+        <div>
+          <p class="eyebrow">score control</p>
+          <h1>점수 입력판</h1>
+          <p class="intro">게임별 점수를 한 줄씩 쌓고, 누적 합계를 진행자 콘솔과 공유합니다.</p>
+        </div>
+        <nav class="score-nav" aria-label="점수판 메뉴">
+          <a class="screen-link" href="index.html">
+            <span aria-hidden="true">‹</span>
+            진행자 콘솔
+          </a>
+          <a class="screen-link" href="game.html?ready=1">
+            <span aria-hidden="true">▣</span>
+            게임 화면
+          </a>
+        </nav>
+      </header>
+
+      <section class="score-board" aria-labelledby="boardTitle">
+        <div class="score-board__top">
+          <div>
+            <p class="eyebrow">live board</p>
+            <h2 id="boardTitle">현재 점수</h2>
+            <p class="score-save-state" id="scoreSaveState">DB 점수를 불러오는 중</p>
+          </div>
+          <button class="secondary-action" id="resetScores" type="button">
+            <span aria-hidden="true">↺</span>
+            전체 초기화
+          </button>
+        </div>
+        <div class="score-summary" id="scoreSummary"></div>
+      </section>
+
+      <section class="score-entry-panel" aria-labelledby="entryTitle">
+        <div class="score-entry-panel__top">
+          <div>
+            <p class="eyebrow">game result</p>
+            <h2 id="entryTitle">게임별 점수 추가</h2>
+          </div>
+        </div>
+        <form class="score-entry-form" id="scoreEntryForm">
+          <label class="game-name-field">
+            <span>게임명</span>
+            <input id="gameNameInput" name="game" autocomplete="off" placeholder="예: 줄줄이 말해요 1라운드" required />
+          </label>
+          <div class="score-inputs" id="scoreInputs" aria-label="팀별 획득 점수 입력"></div>
+          <button class="primary-action score-submit" type="submit">
+            <span aria-hidden="true">＋</span>
+            점수 누적
+          </button>
+        </form>
+      </section>
+
+      <section class="score-history-panel" aria-labelledby="historyTitle">
+        <div class="score-board__top">
+          <div>
+            <p class="eyebrow">score log</p>
+            <h2 id="historyTitle">누적 내역</h2>
+          </div>
+        </div>
+        <div class="score-history" id="scoreHistory"></div>
+      </section>
+    </main>
+
+    <script src="config.js"></script>
+    <script src="data-loader.js"></script>
+    <script src="score-store.js"></script>
+    <script src="score.js"></script>
+  </body>
+</html>

@@ -3,7 +3,9 @@ import { DynamoDBDocumentClient, GetCommand, PutCommand } from "@aws-sdk/lib-dyn
 
 const TABLE_NAME = process.env.TABLE_NAME;
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN ?? "";
-const ITEM_KEY = "active";
+const QUESTION_ITEM_KEY = "active";
+const SCORE_ITEM_KEY = "scores";
+const SCORE_TEAMS = ["A팀", "B팀", "C팀"];
 
 const documentClient = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
@@ -49,11 +51,54 @@ function assertQuestionSet(games) {
   });
 }
 
+function normalizeScores(value) {
+  const source = value && typeof value === "object" ? value : {};
+  return Object.fromEntries(
+    SCORE_TEAMS.map((team) => {
+      const score = Number.parseInt(source[team], 10);
+      return [team, Number.isFinite(score) ? Math.max(0, score) : 0];
+    }),
+  );
+}
+
+function normalizeScoreEntry(entry, index = 0) {
+  const game = String(entry?.game ?? "").trim();
+  if (!game) return null;
+
+  return {
+    id: String(entry?.id ?? `score-${Date.now()}-${index}`),
+    game: game.slice(0, 80),
+    scores: normalizeScores(entry?.scores),
+    createdAt: String(entry?.createdAt ?? new Date().toISOString()),
+  };
+}
+
+function normalizeScoreEntries(value) {
+  if (!Array.isArray(value)) return [];
+  return value.map(normalizeScoreEntry).filter(Boolean);
+}
+
+function totalScoreEntries(entries) {
+  return entries.reduce((totals, entry) => {
+    SCORE_TEAMS.forEach((team) => {
+      totals[team] += entry.scores[team] ?? 0;
+    });
+    return totals;
+  }, normalizeScores());
+}
+
+function normalizeScoreState(value) {
+  const source = value && typeof value === "object" ? value : {};
+  const entries = normalizeScoreEntries(source.entries);
+  const scores = entries.length > 0 ? totalScoreEntries(entries) : normalizeScores(source.scores);
+  return { scores, entries };
+}
+
 async function getQuestions() {
   const result = await documentClient.send(
     new GetCommand({
       TableName: TABLE_NAME,
-      Key: { pk: ITEM_KEY },
+      Key: { pk: QUESTION_ITEM_KEY },
     }),
   );
 
@@ -81,7 +126,7 @@ async function saveQuestions(event) {
     new PutCommand({
       TableName: TABLE_NAME,
       Item: {
-        pk: ITEM_KEY,
+        pk: QUESTION_ITEM_KEY,
         games: body.games,
         updatedAt,
       },
@@ -91,19 +136,63 @@ async function saveQuestions(event) {
   return response(200, { updatedAt });
 }
 
+async function getScores() {
+  const result = await documentClient.send(
+    new GetCommand({
+      TableName: TABLE_NAME,
+      Key: { pk: SCORE_ITEM_KEY },
+    }),
+  );
+  const scoreState = normalizeScoreState(result.Item);
+
+  return response(200, {
+    ...scoreState,
+    updatedAt: result.Item?.updatedAt ?? null,
+  });
+}
+
+async function saveScores(event) {
+  const body = parseBody(event);
+  const scoreState = normalizeScoreState(body);
+  const updatedAt = new Date().toISOString();
+
+  await documentClient.send(
+    new PutCommand({
+      TableName: TABLE_NAME,
+      Item: {
+        pk: SCORE_ITEM_KEY,
+        scores: scoreState.scores,
+        entries: scoreState.entries,
+        updatedAt,
+      },
+    }),
+  );
+
+  return response(200, { ...scoreState, updatedAt });
+}
+
 export async function handler(event) {
   if (!TABLE_NAME) {
     return response(500, { message: "TABLE_NAME is not configured" });
   }
 
   try {
-    if (event.requestContext?.http?.method === "GET") {
-      return getQuestions();
+    const method = event.requestContext?.http?.method;
+    const path = event.rawPath ?? event.requestContext?.http?.path ?? "";
+
+    if (path.endsWith("/scores")) {
+      if (method === "GET") return getScores();
+      if (method === "PUT") return saveScores(event);
+      return response(405, { message: "Method not allowed" });
     }
-    if (event.requestContext?.http?.method === "PUT") {
-      return saveQuestions(event);
+
+    if (path.endsWith("/questions") || path === "") {
+      if (method === "GET") return getQuestions();
+      if (method === "PUT") return saveQuestions(event);
+      return response(405, { message: "Method not allowed" });
     }
-    return response(405, { message: "Method not allowed" });
+
+    return response(404, { message: "Not found" });
   } catch (error) {
     return response(400, { message: error.message });
   }

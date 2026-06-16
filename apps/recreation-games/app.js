@@ -1,6 +1,6 @@
 let games = window.GAME_DATA;
-const teams = ["A팀", "B팀", "C팀"];
-const scores = Object.fromEntries(teams.map((team) => [team, 0]));
+const teams = window.RecreationScores.teams;
+let scores = window.RecreationScores.getScores();
 
 const gameTabs = document.querySelector("#gameTabs");
 const scoreGrid = document.querySelector("#scoreGrid");
@@ -202,16 +202,13 @@ questionGrid.addEventListener("click", (event) => {
 scoreGrid.addEventListener("click", (event) => {
   const button = event.target.closest("[data-score-team]");
   if (!button) return;
-  const team = button.dataset.scoreTeam;
-  scores[team] = Math.max(0, scores[team] + Number(button.dataset.scoreDelta));
-  renderScores();
+  scores = window.RecreationScores.addScore(button.dataset.scoreTeam, Number(button.dataset.scoreDelta));
 });
 
 scoreGrid.addEventListener("change", (event) => {
   const input = event.target.closest("[data-score-input]");
   if (!input) return;
-  scores[input.dataset.scoreInput] = Math.max(0, Number.parseInt(input.value, 10) || 0);
-  renderScores();
+  scores = window.RecreationScores.setScore(input.dataset.scoreInput, input.value);
 });
 
 toggleAnswer.addEventListener("click", () => {
@@ -232,14 +229,16 @@ document.querySelector("#randomQuestion").addEventListener("click", () => {
 });
 
 document.querySelector("#resetScores").addEventListener("click", () => {
-  teams.forEach((team) => {
-    scores[team] = 0;
-  });
-  renderScores();
+  scores = window.RecreationScores.resetScores();
 });
 
 async function init() {
   games = await window.RecreationData.loadGames(window.GAME_DATA);
+  window.RecreationScores.subscribe((nextScores) => {
+    scores = nextScores;
+    renderScores();
+  });
+  scores = await window.RecreationScores.loadScores();
   if (!games.some((game) => game.id === activeGameId)) {
     activeGameId = games[0].id;
     activeCategoryIndex = 0;
