@@ -6,6 +6,7 @@ Solbox workshop 2026 운영 도구 모노레포입니다.
 
 - `apps/team-picker`: 팀 배치 도구
 - `apps/recreation-games`: 레크 게임 진행 콘솔과 참가자 화면
+- `functions/recreation-questions.js`: 레크 게임 문제 조회/저장 API
 
 ## 실행
 
@@ -21,6 +22,7 @@ npm run start:recreation
 - 레크 게임: http://localhost:4173
 - 배포된 팀 배치 도구: https://picker.ollida.kr
 - 배포된 레크 게임: https://game.ollida.kr
+- 레크 게임 관리자: https://game.ollida.kr/admin.html
 
 ## 배포
 
@@ -32,7 +34,11 @@ npm run start:recreation
 GitHub 저장소 설정에 아래 값을 등록해야 한다.
 
 - Secret `AWS_ROLE_ARN`: GitHub OIDC로 assume할 AWS IAM role ARN
+- Secret `ADMIN_TOKEN`: 레크 게임 관리자 저장 권한 토큰
 - Variable `AWS_REGION`: `ap-northeast-2`
+
+레크 게임 문제는 기본적으로 `apps/recreation-games/games-data.js`를 사용한다.
+관리자 화면에서 저장한 뒤에는 `game-api.ollida.kr`의 DynamoDB 데이터가 우선 적용된다.
 
 로컬에서 직접 배포:
 

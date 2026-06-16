@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>게임 문제 관리자</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body>
+    <main class="admin-shell">
+      <header class="admin-top">
+        <div>
+          <p class="eyebrow">question admin</p>
+          <h1>게임 문제 관리자</h1>
+          <p class="intro">게임별 문제를 수정하고 운영 DB에 저장합니다.</p>
+        </div>
+        <nav class="admin-nav" aria-label="관리 메뉴">
+          <a class="screen-link" href="index.html">
+            <span aria-hidden="true">‹</span>
+            진행자 콘솔
+          </a>
+          <a class="screen-link" href="game.html?ready=1">
+            <span aria-hidden="true">▣</span>
+            게임 화면
+          </a>
+        </nav>
+      </header>
+
+      <section class="admin-settings" aria-label="저장 설정">
+        <label>
+          API URL
+          <input id="apiUrl" type="url" placeholder="https://game-api.ollida.kr" />
+        </label>
+        <label>
+          관리자 토큰
+          <input id="adminToken" type="password" autocomplete="current-password" placeholder="ADMIN_TOKEN" />
+        </label>
+        <button class="primary-action" id="saveSettings" type="button">
+          <span aria-hidden="true">✓</span>
+          설정 저장
+        </button>
+      </section>
+
+      <section class="admin-layout" aria-label="문제 편집기">
+        <aside class="admin-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">games</p>
+              <h2>게임 선택</h2>
+            </div>
+          </div>
+          <div class="admin-list" id="gameList"></div>
+
+          <div class="panel-heading admin-heading-gap">
+            <div>
+              <p class="eyebrow">groups</p>
+              <h2>그룹 선택</h2>
+            </div>
+          </div>
+          <div class="admin-list" id="categoryList"></div>
+        </aside>
+
+        <section class="admin-editor">
+          <div class="admin-editor__top">
+            <div>
+              <p class="eyebrow" id="editorKicker">문제 편집</p>
+              <h2 id="editorTitle">줄줄이 말해요</h2>
+            </div>
+            <div class="admin-actions">
+              <button class="secondary-action" id="addQuestion" type="button">
+                <span aria-hidden="true">＋</span>
+                문제 추가
+              </button>
+              <button class="primary-action" id="saveRemote" type="button">
+                <span aria-hidden="true">↥</span>
+                DB 저장
+              </button>
+            </div>
+          </div>
+
+          <div class="question-editor" id="questionEditor"></div>
+        </section>
+      </section>
+
+      <section class="admin-tools" aria-label="JSON 도구">
+        <div class="admin-tool-row">
+          <button class="secondary-action" id="exportJson" type="button">
+            <span aria-hidden="true">↧</span>
+            JSON 내보내기
+          </button>
+          <button class="secondary-action" id="importJson" type="button">
+            <span aria-hidden="true">↤</span>
+            JSON 가져오기
+          </button>
+          <button class="secondary-action" id="resetBundled" type="button">
+            <span aria-hidden="true">↺</span>
+            기본 문제로 되돌리기
+          </button>
+        </div>
+        <textarea id="jsonBox" spellcheck="false" placeholder="내보낸 JSON 또는 가져올 JSON이 여기에 표시됩니다."></textarea>
+      </section>
+
+      <p class="admin-status" id="status" role="status" aria-live="polite"></p>
+    </main>
+
+    <script src="games-data.js"></script>
+    <script src="config.js"></script>
+    <script src="data-loader.js"></script>
+    <script src="admin.js"></script>
+  </body>
+</html>

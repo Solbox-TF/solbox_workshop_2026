@@ -9,7 +9,11 @@
     "deploy": "sst deploy",
     "deploy:aws": "sst deploy --stage production",
     "remove:aws": "sst remove --stage production",
-    "check": "node --check apps/team-picker/server.js && node --check apps/recreation-games/server.js && node --check apps/recreation-games/app.js && node --check apps/recreation-games/game.js && node --check apps/recreation-games/games-data.js"
+    "check": "node --check apps/team-picker/server.js && node --check apps/recreation-games/server.js && node --check apps/recreation-games/app.js && node --check apps/recreation-games/game.js && node --check apps/recreation-games/admin.js && node --check apps/recreation-games/data-loader.js && node --check apps/recreation-games/games-data.js && node --check functions/recreation-questions.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.830.0",
+    "@aws-sdk/lib-dynamodb": "^3.830.0"
   },
   "devDependencies": {
     "sst": "^4.15.2"

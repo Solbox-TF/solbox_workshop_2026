@@ -23,6 +23,40 @@ export default $config({
     const ollidaDns = sst.aws.dns({
       zone: "Z09780493F6H2HR2PRAE4",
     });
+    const questionsTable = new sst.aws.Dynamo("RecreationQuestions", {
+      fields: {
+        pk: "string",
+      },
+      primaryIndex: { hashKey: "pk" },
+    });
+    const questionsApi = new sst.aws.ApiGatewayV2("RecreationQuestionsApi", {
+      domain: {
+        name: "game-api.ollida.kr",
+        dns: ollidaDns,
+      },
+      cors: {
+        allowOrigins: ["https://game.ollida.kr", "http://localhost:4173", "http://127.0.0.1:4173"],
+        allowMethods: ["GET", "PUT", "OPTIONS"],
+        allowHeaders: ["content-type", "x-admin-token"],
+      },
+    });
+    const questionsHandler = {
+      handler: "functions/recreation-questions.handler",
+      link: [questionsTable],
+      environment: {
+        TABLE_NAME: questionsTable.name,
+        ADMIN_TOKEN: process.env.ADMIN_TOKEN ?? "",
+      },
+      permissions: [
+        {
+          actions: ["dynamodb:GetItem", "dynamodb:PutItem"],
+          resources: [questionsTable.arn],
+        },
+      ],
+    };
+
+    questionsApi.route("GET /questions", questionsHandler);
+    questionsApi.route("PUT /questions", questionsHandler);
 
     const recreationGames = new sst.aws.StaticSite("RecreationGames", {
       path: "apps/recreation-games",
@@ -48,6 +82,7 @@ export default $config({
 
     return {
       recreationGamesUrl: recreationGames.url,
+      recreationQuestionsApiUrl: questionsApi.url,
       teamPickerUrl: teamPicker.url,
     };
   },

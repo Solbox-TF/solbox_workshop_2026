@@ -1,4 +1,4 @@
-const games = window.GAME_DATA;
+let games = window.GAME_DATA;
 const teams = ["A팀", "B팀", "C팀"];
 const scores = Object.fromEntries(teams.map((team) => [team, 0]));
 
@@ -238,5 +238,16 @@ document.querySelector("#resetScores").addEventListener("click", () => {
   renderScores();
 });
 
-renderScores();
-renderAll();
+async function init() {
+  games = await window.RecreationData.loadGames(window.GAME_DATA);
+  if (!games.some((game) => game.id === activeGameId)) {
+    activeGameId = games[0].id;
+    activeCategoryIndex = 0;
+    activeQuestionIndex = 0;
+  }
+  renderScores();
+  renderAll();
+  hideAnswer();
+}
+
+init();

@@ -1,0 +1,231 @@
+.admin-shell {
+  position: relative;
+  width: min(1260px, calc(100% - 28px));
+  margin: 0 auto;
+  padding: 24px 0 56px;
+}
+
+.admin-top,
+.admin-settings,
+.admin-layout,
+.admin-tools {
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: 6px 6px 0 var(--ink), var(--shadow);
+}
+
+.admin-top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  padding: clamp(24px, 4vw, 40px);
+}
+
+.admin-top h1 {
+  max-width: none;
+  font-size: clamp(2.4rem, 6vw, 5.2rem);
+}
+
+.admin-nav,
+.admin-actions,
+.admin-tool-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.admin-settings {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(220px, 1fr) auto;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 18px;
+}
+
+.admin-settings label,
+.question-field label {
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.admin-settings input,
+.question-field textarea,
+#jsonBox {
+  width: 100%;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: white;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 800;
+}
+
+.admin-settings input {
+  min-height: 46px;
+  padding: 0 12px;
+}
+
+.admin-layout {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.42fr) minmax(0, 1fr);
+  gap: 16px;
+  margin-top: 18px;
+  padding: 18px;
+}
+
+.admin-panel,
+.admin-editor,
+.admin-tools {
+  padding: 18px;
+}
+
+.admin-panel,
+.admin-editor {
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  background: white;
+}
+
+.admin-heading-gap {
+  margin-top: 24px;
+}
+
+.admin-list {
+  display: grid;
+  gap: 9px;
+  margin-top: 12px;
+}
+
+.admin-list button {
+  min-height: 44px;
+  padding: 9px 12px;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: #fffdf7;
+  color: var(--ink);
+  font-weight: 900;
+  text-align: left;
+  box-shadow: 3px 3px 0 var(--ink);
+}
+
+.admin-list button.is-active {
+  background: var(--yellow);
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+
+.admin-editor__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.question-editor {
+  display: grid;
+  gap: 14px;
+}
+
+.question-row {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr) 42px;
+  gap: 12px;
+  padding: 14px;
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  background: #f8fff4;
+}
+
+.question-index {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--green);
+  color: white;
+  font-weight: 900;
+}
+
+.question-fields {
+  display: grid;
+  gap: 10px;
+}
+
+.question-field textarea {
+  min-height: 72px;
+  resize: vertical;
+  padding: 10px 12px;
+  line-height: 1.45;
+}
+
+.delete-question {
+  width: 42px;
+  height: 42px;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: #fff4f1;
+  color: var(--red);
+  font-weight: 900;
+}
+
+.admin-tools {
+  margin-top: 18px;
+}
+
+#jsonBox {
+  min-height: 220px;
+  margin-top: 14px;
+  padding: 14px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.admin-status {
+  position: sticky;
+  bottom: 14px;
+  width: fit-content;
+  max-width: 100%;
+  min-height: 44px;
+  display: none;
+  align-items: center;
+  margin: 18px 0 0 auto;
+  padding: 10px 14px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: var(--yellow);
+  box-shadow: 4px 4px 0 var(--ink);
+  font-weight: 900;
+}
+
+.admin-status.is-visible {
+  display: flex;
+}
+
+@media (max-width: 860px) {
+  .admin-top,
+  .admin-editor__top {
+    display: grid;
+  }
+
+  .admin-settings,
+  .admin-layout,
+  .question-row {
+    grid-template-columns: 1fr;
+  }
+
+  .question-index {
+    width: auto;
+    border-radius: 8px;
+  }
+}

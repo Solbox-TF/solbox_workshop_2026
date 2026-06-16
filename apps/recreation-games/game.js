@@ -1,4 +1,4 @@
-const stageGames = window.GAME_DATA;
+let stageGames = window.GAME_DATA;
 
 const gameSwitcher = document.querySelector("#gameSwitcher");
 const categorySwitcher = document.querySelector("#categorySwitcher");
@@ -193,5 +193,16 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-render();
-hideAnswer();
+async function init() {
+  stageGames = await window.RecreationData.loadGames(window.GAME_DATA);
+  if (!stageGames.some((game) => game.id === activeGameId)) {
+    activeGameId = stageGames[0].id;
+    activeCategoryIndex = 0;
+    activeQuestionIndex = 0;
+    isReadyPage = true;
+  }
+  render();
+  hideAnswer();
+}
+
+init();
