@@ -2,7 +2,10 @@
   const API_URL_KEY = "recreation_api_url";
 
   function normalizeApiUrl(value) {
-    return (value ?? "").trim().replace(/\/+$/, "");
+    return (value ?? "")
+      .trim()
+      .replace(/\/+$/, "")
+      .replace(/\/questions$/, "");
   }
 
   function getApiUrl() {
@@ -15,8 +18,8 @@
     const override = normalizeApiUrl(localStorage.getItem(API_URL_KEY));
     const deferredUrls = new Set((window.RECREATION_CONFIG?.deferredApiUrls ?? []).map(normalizeApiUrl));
     const urls = [
-      override,
       normalizeApiUrl(window.RECREATION_CONFIG?.apiUrl),
+      override,
       ...(window.RECREATION_CONFIG?.fallbackApiUrls ?? []).map(normalizeApiUrl),
     ].filter(Boolean);
 
