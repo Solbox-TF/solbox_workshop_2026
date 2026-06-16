@@ -13,14 +13,14 @@
 
   function getApiUrls() {
     const override = normalizeApiUrl(localStorage.getItem(API_URL_KEY));
-    if (override) return [override];
-
+    const deferredUrls = new Set((window.RECREATION_CONFIG?.deferredApiUrls ?? []).map(normalizeApiUrl));
     const urls = [
+      override,
       normalizeApiUrl(window.RECREATION_CONFIG?.apiUrl),
       ...(window.RECREATION_CONFIG?.fallbackApiUrls ?? []).map(normalizeApiUrl),
     ].filter(Boolean);
 
-    return [...new Set(urls)];
+    return [...new Set(urls)].sort((left, right) => Number(deferredUrls.has(left)) - Number(deferredUrls.has(right)));
   }
 
   function setApiUrl(value) {
