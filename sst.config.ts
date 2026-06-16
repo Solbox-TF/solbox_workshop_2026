@@ -35,7 +35,14 @@ export default $config({
         dns: ollidaDns,
       },
       cors: {
-        allowOrigins: ["https://game.ollida.kr", "http://localhost:4173", "http://127.0.0.1:4173"],
+        allowOrigins: [
+          "https://game.ollida.kr",
+          "http://localhost:4173",
+          "http://127.0.0.1:4173",
+          "http://localhost:4174",
+          "http://127.0.0.1:4174",
+          "null",
+        ],
         allowMethods: ["GET", "PUT", "OPTIONS"],
         allowHeaders: ["content-type", "x-admin-token"],
       },
