@@ -194,6 +194,9 @@ document.addEventListener("keydown", (event) => {
 });
 
 async function init() {
+  render();
+  hideAnswer();
+
   stageGames = await window.RecreationData.loadGames(window.GAME_DATA);
   if (!stageGames.some((game) => game.id === activeGameId)) {
     activeGameId = stageGames[0].id;

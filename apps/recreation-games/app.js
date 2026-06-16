@@ -233,12 +233,26 @@ document.querySelector("#resetScores").addEventListener("click", () => {
 });
 
 async function init() {
-  games = await window.RecreationData.loadGames(window.GAME_DATA);
   window.RecreationScores.subscribe((nextScores) => {
     scores = nextScores;
     renderScores();
   });
-  scores = await window.RecreationScores.loadScores();
+
+  renderScores();
+  renderAll();
+  hideAnswer();
+
+  const [loadedGames, loadedScores] = await Promise.allSettled([
+    window.RecreationData.loadGames(window.GAME_DATA),
+    window.RecreationScores.loadScores(),
+  ]);
+
+  if (loadedGames.status === "fulfilled") {
+    games = loadedGames.value;
+  }
+  if (loadedScores.status === "fulfilled") {
+    scores = loadedScores.value;
+  }
   if (!games.some((game) => game.id === activeGameId)) {
     activeGameId = games[0].id;
     activeCategoryIndex = 0;
