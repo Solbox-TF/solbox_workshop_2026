@@ -54,6 +54,7 @@
         if (Array.isArray(payload.games) && payload.games.length > 0) {
           return payload.games;
         }
+        return cloneGames(fallbackGames);
       } catch (error) {
         console.warn(`Using bundled game data. Failed API: ${apiUrl}`, error);
       } finally {
@@ -81,10 +82,15 @@
         });
         const payload = await response.json().catch(() => ({}));
         if (!response.ok) {
-          throw new Error(payload.message ?? `저장 실패: HTTP ${response.status}`);
+          const error = new Error(payload.message ?? `저장 실패: HTTP ${response.status}`);
+          error.isHttpResponse = true;
+          throw error;
         }
         return payload;
       } catch (error) {
+        if (error.isHttpResponse) {
+          throw error;
+        }
         lastError = error;
         console.warn(`Failed to save games through API: ${apiUrl}`, error);
       }
